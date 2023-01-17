@@ -1,8 +1,8 @@
 # CS152 Project
  
-Language Name:  
-File extention: 
-Compiler Name:  Compilotron
+Language Name:  <br>
+File extention: <br>
+Compiler Name:  Compilotron <br>
 
 | **Language Feature**               	| **Code Example**                                                   	|
 |------------------------------------	|--------------------------------------------------------------------	|
@@ -20,6 +20,6 @@ Compiler Name:  Compilotron
 
 # Miscellaneous
 
-Valid identifiers:      No leading numbers, No reserved names e.g. if, No special characters e.g. '"[({,.
-Case sensitive:         yes
-Whitespaces ignored:    yes
+Valid identifiers:      No leading numbers, No reserved names e.g. if, No special characters e.g. '"[({,. <br>
+Case sensitive:         yes <br>
+Whitespaces ignored:    yes <br>
