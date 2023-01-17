@@ -17,6 +17,23 @@ Compiler Name:  Compilotron <br>
 | Comments                           	| //_Comment after_<br><br>/* _Comment between_ */                   	|
 | Functions                          	| var func(_arguments_){_code_}                                      	|
 
+| ** Symbol in Language**             | **Token Name**                                                      |
+|------------------------------------	|--------------------------------------------------------------------	|
+| int                                 | INTEGER                                                             |
+| []                                  | ARRAY                                                               |
+| =                                   | EQUAL                                                               |
+| +                                   | ADD                                                                 |
+| -                                   | SUBTRACT                                                            |
+| *                                   | MULTIPLY                                                            |
+| /                                   | DIVIDE                                                              |
+| while                               | WHILE                                                               |
+| (                                   | L_PARENTH                                                           |
+| )                                   | R_PARENTH                                                           |
+| if                                  | IF                                                                  |
+| else                                | ELSE                                                                |
+| read                                | READ                                                                |
+| write                               | WRITE                                                               |
+| //                                  | COMMENT                                                             |
 
 # Miscellaneous
 
