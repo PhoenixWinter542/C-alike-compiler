@@ -6,22 +6,27 @@ int eqCount = 0;
 int failed = 0;
 %}
 
-DIGIT     [0-9]*
+/* BASIC */
+DIGIT     [0-9]
+ALPHA     [a-zA-Z]
 ALNUM     [a-zA-Z0-9]+
-INTEGER   "int "[a-zA-Z]+
-ARRAY     "[]"|"["[:DIGIT:]"]"|"["([:DIGIT:],)*[:DIGIT:]"]"|"["[:INTEGER:]"]"|"["([:INTEGER:],)*[:INTEGER:]"]"|"["([:DIGIT:],)*[:INTEGER:]"]"|"["([:INTEGER:],)*[:DIGIT:]"]"
-ASSIGN    [=]
+VARIABLE  [a-zA-Z0-9]+
+INTEGER   "int "[ALPHA]+
+RELATE    "<"|"=="|">"|"!="
+
+OBJECT    [[:INTEGER:]]
+VARCNST   [[:INTEGER:][:DIGIT:]]
+ARRAY     "[""]"|"["[:DIGIT:]"]"
+ASSIGN    [:OBJECT:]"="[:VARCNST:];
 ARITH     "+"|"-"|"*"|"/"
 
-DECLARE   [[:INTEGER:]]=[[:VAR:][:DIGIT:]]
-ARG       []
-CONDITION []
+ARG       ""|"["[:VARCNST:]"]"|"["([:VARCNST:],)*[:VARCNST:]"]"
+COMPARE   []
 
-RELATE    "<"|"=="|">"|"!="
 LOOP      "while" | "do while"
 CASE    "if" | "else"
 FILE      "read" | "write"
-COMMENT   "//"
+COMMENT   "//"[.]*\n
 
 %%
 
@@ -29,6 +34,8 @@ COMMENT   "//"
             printf( "An integer: %s \n", yytext );
             ++intCount;
             }
+
+{VARIABLE}    {printf("a ");}
 
 "+"|"-"|"*"|"/"   {printf( "An operator: %s\n", yytext ); ++opCount;}
 
