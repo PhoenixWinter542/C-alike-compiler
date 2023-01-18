@@ -1,7 +1,7 @@
 # CS152 Project
  
-Language Name:  <br>
-File extention: <br>
+Language Name:  Pilot<br>
+File extention: .plt<br>
 Compiler Name:  Compilotron <br>
 
 | **Language Feature**               	| **Code Example**                                                   	|
