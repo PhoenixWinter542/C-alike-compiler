@@ -7,6 +7,7 @@ int failed = 0;
 %}
 
 /* BASIC */
+/* "+"|"-"|"*"|"/"   {printf( "An operator: %s\n", yytext ); ++opCount;} */
 DIGIT     [0-9]
 ALPHA     [a-zA-Z]
 ALNUM     [a-zA-Z0-9]+
@@ -17,7 +18,10 @@ OPEN      [
 CLOSE     ]
 LESS      <
 GREATER   >
-EQUAL     =
+LTE       <=
+GTE       >=
+EQUAL     =matt
+INIT      =
 NOT       !
 ADD       +
 SUBTRACT  -
@@ -48,14 +52,27 @@ COMMENT   "//"[.]*\n
 
 %%
 
-{DIGIT}+    {
-            printf( "An integer: %s \n", yytext );
-            ++intCount;
-            }
+"<"               {printf("LESS \n", yytext);}
+">"               {printf("GREATER \n", yytext);}
+"<="              {printf("LTE \n", yytext);}
+">="              {printf("GTE \n", yytext);}
+"!="              {printf("NOTEQUAL \n", yytext);}
+"=="              {printf("EQUAL \n", yytext);}
+"="               {printf("ASSIGn \n", yytext);}
+"+"               {printf("ADD \n", yytext);}
+"-"               {printf("SUBTRACT \n", yytext);}
+"*"               {printf("MULTIPLY \n", yytext);}
+"/"               {printf("DIVIDE \n", yytext);}
+"("               {printf("LPARENTH \n", yytext);}
+")"               {printf("RPARENTH \n", yytext);}
+";"               {printf("END \n", yytext);}
+"if"              {printf("IF \n", yytext);}
+"else"            {printf("ELSE \n", yytext);}
+"while"           {printf("WHILE \n", yytext);}
 
-{VARIABLE}    {printf("a ");}
+{DIGIT}+          {printf( "INTEGER", yytext ); ++intCount;}
 
-"+"|"-"|"*"|"/"   {printf( "An operator: %s\n", yytext ); ++opCount;}
+{VARIABLE}        {printf("a ");}
 
 "("|")"           {printf( "A parentheses: %s\n", yytext); ++parenCount;}
 
@@ -75,11 +92,13 @@ int main( void )
   printf("NUMBER: %d\n", 100);
   printf("Ctrl+D to quit.\n");
   yylex();
+  /*
   if(0 == failed){
     printf("# of numbers: %d\n", intCount);
     printf("# of operators: %d\n", opCount);
     printf("# of parentheses: %d\n", parenCount);
     printf("# of equations: %d\n", eqCount);
   }
+  */
   printf("Quiting...\n");
 }
