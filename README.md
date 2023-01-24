@@ -15,12 +15,13 @@ Compiler Name:  Compilotron <br>
 | If-then-Else statements            	| if(_condition_){_code_}else{_code_}<br><br>if(_condition_){_code_} 	|
 | Read and Write statements          	| read "FileName"<br><br>write "FileName"                            	|
 | Comments                           	| //_Comment after_<br><br>/* _Comment between_ */                   	|
-| Functions                          	| var func(_arguments_){_code_}                                      	|
+| Functions                          	| int func(_arguments_){_code_}                                      	|
 
 | ** Symbol in Language**             | **Token Name**                                                      |
 |------------------------------------	|--------------------------------------------------------------------	|
 | int                                 | INTEGER                                                             |
-| []                                  | ARRAY                                                               |
+| [                                   | OPEN                                                                |
+| ]                                   | CLOSE                                                               |
 | =                                   | EQUAL                                                               |
 | +                                   | ADD                                                                 |
 | -                                   | SUBTRACT                                                            |
@@ -33,7 +34,7 @@ Compiler Name:  Compilotron <br>
 | else                                | ELSE                                                                |
 | read                                | READ                                                                |
 | write                               | WRITE                                                               |
-| //                                  | COMMENT                                                             |
+| ;                                   | END                                                                 |
 
 # Miscellaneous
 
