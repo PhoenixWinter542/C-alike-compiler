@@ -415,8 +415,8 @@ static yyconst flex_int32_t yy_meta[15] =
 
 static yyconst flex_int16_t yy_base[20] =
     {   0,
-        0,    0,   32,   33,   13,   15,   33,   33,    9,   33,
-       10,   17,   21,   15,   16,   16,   33,   33,   28
+        0,    0,   30,   31,   13,   15,   31,   31,   19,   31,
+        9,   14,   20,   17,   14,   11,   31,   31,   19
     } ;
 
 static yyconst flex_int16_t yy_def[20] =
@@ -425,22 +425,22 @@ static yyconst flex_int16_t yy_def[20] =
        18,   19,   18,   18,   18,   19,   18,    0,   18
     } ;
 
-static yyconst flex_int16_t yy_nxt[48] =
+static yyconst flex_int16_t yy_nxt[46] =
     {   0,
         4,    5,    6,    7,    7,    8,    8,    8,    8,    9,
-       10,   11,   12,    4,   13,   13,   13,   13,   14,   15,
-       15,   15,   13,   13,   14,   15,   15,   15,   16,   17,
-       17,   18,    3,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,   18
+       10,   11,   12,    4,   13,   13,   13,   13,   15,   16,
+       15,   13,   13,   15,   17,   15,   14,   17,   14,   18,
+        3,   18,   18,   18,   18,   18,   18,   18,   18,   18,
+       18,   18,   18,   18,   18
     } ;
 
-static yyconst flex_int16_t yy_chk[48] =
+static yyconst flex_int16_t yy_chk[46] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    5,    5,    6,    6,    9,   11,
-        9,   11,   13,   13,   14,   15,   14,   15,   19,   16,
-       12,    3,   18,   18,   18,   18,   18,   18,   18,   18,
-       18,   18,   18,   18,   18,   18,   18
+        1,    1,    1,    1,    5,    5,    6,    6,   11,   19,
+       11,   13,   13,   15,   16,   15,   14,   12,    9,    3,
+       18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
+       18,   18,   18,   18,   18
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -647,7 +647,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 31 "lexer.lex"
+#line 49 "lexer.lex"
 
 
 #line 654 "lex.yy.c"
@@ -709,7 +709,7 @@ yy_match:
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 33 );
+		while ( yy_base[yy_current_state] != 31 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -735,7 +735,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 33 "lexer.lex"
+#line 51 "lexer.lex"
 {
             printf( "An integer: %s \n", yytext );
             ++intCount;
@@ -743,43 +743,43 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 38 "lexer.lex"
+#line 56 "lexer.lex"
 {printf("a ");}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 40 "lexer.lex"
+#line 58 "lexer.lex"
 {printf( "An operator: %s\n", yytext ); ++opCount;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "lexer.lex"
+#line 60 "lexer.lex"
 {printf( "A parentheses: %s\n", yytext); ++parenCount;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 44 "lexer.lex"
+#line 62 "lexer.lex"
 {printf( "An equal sign: %s\n", yytext); ++eqCount;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 46 "lexer.lex"
+#line 64 "lexer.lex"
 /* eat up one-line comments */
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 48 "lexer.lex"
+#line 66 "lexer.lex"
 /* eat up whitespace */
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 50 "lexer.lex"
+#line 68 "lexer.lex"
 {printf( "Unrecognized character: %s\n", yytext ); failed = 1; return 0;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 52 "lexer.lex"
+#line 70 "lexer.lex"
 ECHO;
 	YY_BREAK
 #line 786 "lex.yy.c"
@@ -1776,7 +1776,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 52 "lexer.lex"
+#line 70 "lexer.lex"
 
 
 

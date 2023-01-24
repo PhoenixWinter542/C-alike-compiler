@@ -10,9 +10,27 @@ int failed = 0;
 DIGIT     [0-9]
 ALPHA     [a-zA-Z]
 ALNUM     [a-zA-Z0-9]+
-VARIABLE  [a-zA-Z0-9]+
-INTEGER   "int "[ALPHA]+
-RELATE    "<"|"=="|">"|"!="
+VARIABLE  {ALPHA}{ALNUM}*
+
+INTEGER   "int "{VARIABLE}
+OPEN      [
+CLOSE     ]
+LESS      <
+GREATER   >
+EQUAL     =
+NOT       !
+ADD       +
+SUBTRACT  -
+MULTIPLY  *
+DIVIDE    /
+WHILE     while
+L_PARENTH (
+R_PARENTH )
+IF        if
+ELSE      else
+READ      read
+WRITE     write
+END       ;
 
 OBJECT    [[:INTEGER:]]
 VARCNST   [[:INTEGER:][:DIGIT:]]
