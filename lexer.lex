@@ -72,7 +72,7 @@ FUNC      [:TYPE:][:SPACE:][:VARIABLE:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALB
 ">="              {printf("GTE \n", yytext);}
 "!="              {printf("NOTEQUAL \n", yytext);}
 "=="              {printf("EQUAL \n", yytext);}
-"="               {printf("ASSIGn \n", yytext);}
+"="               {printf("ASSIGN \n", yytext);}
 "+"               {printf("ADD \n", yytext);}
 "-"               {printf("SUBTRACT \n", yytext);}
 "*"               {printf("MULTIPLY \n", yytext);}
