@@ -12,6 +12,7 @@ DIGIT     [0-9]
 ALPHA     [a-zA-Z]
 ALNUM     [a-zA-Z0-9]+
 VARIABLE  {ALPHA}{ALNUM}*
+SPACE     [ \t\n]*
 
 INTEGER   "int "{VARIABLE}
 OPEN      [
@@ -20,7 +21,7 @@ LESS      <
 GREATER   >
 LTE       <=
 GTE       >=
-EQUAL     =matt
+EQUAL     =
 INIT      =
 NOT       !
 ADD       +
@@ -35,20 +36,26 @@ ELSE      else
 READ      read
 WRITE     write
 END       ;
+BALBRACE  "{"[^{}]*"}"|"{"[^{}]*[:BALBRACE:][^{}]*"}"  /* Should allow for using braces inside of brackets (balanced only)*/
+BALPAREN  "("[^()]*")"|"("[^()]*[:BALPAREN:][^()]*")"
+BALBRACE  "["[^\[\]]*"]"|"["[^\[\]]*[:BALPAREN:][^)]*"]"
 
+/* Compound */
 OBJECT    [[:INTEGER:]]
 VARCNST   [[:INTEGER:][:DIGIT:]]
-ARRAY     "[""]"|"["[:DIGIT:]"]"
-ASSIGN    [:OBJECT:]"="[:VARCNST:];
+ARRAY     "["[:DIGIT:]"]"
+ASSIGN    [:OBJECT:][:SPACE:]"="[:SPACE:][:VARCNST:][:SPACE:]";"
 ARITH     "+"|"-"|"*"|"/"
 
 ARG       ""|"["[:VARCNST:]"]"|"["([:VARCNST:],)*[:VARCNST:]"]"
-COMPARE   []
+COMPARE   [[:VARCNST:][:RELATE:][:VARCNST:]]
+DECLARE   ""|[:OBJECT:][:SPACE:][:VARCNST:]|([:OBJECT:][:SPACE:][:VARCNST:],)*[:OBJECT:][:SPACE:][:VARCNST:]
 
 LOOP      "while" | "do while"
-CASE    "if" | "else"
+CASE      "if" | "else"
 FILE      "read" | "write"
-COMMENT   "//"[.]*\n
+COMMENT   "//"[.]*\n|["/*"[.]*"*/"]
+FUNC      "("[:DECLARE:]")""{"[:BALBRACK:]*"}"
 
 %%
 
