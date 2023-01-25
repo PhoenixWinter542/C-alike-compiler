@@ -8,13 +8,12 @@ int failed = 0;
 
 /* BASIC */
 /* "+"|"-"|"*"|"/"   {printf( "An operator: %s\n", yytext ); ++opCount;} */
-DIGIT     [0-9]
+DIGIT     [0-9]+{ARNIE}
 ALPHA     [a-zA-Z]
 ALNUM     [a-zA-Z0-9]+
+SPACE     [ \t\n]+
 VARIABLE  {ALPHA}{ALNUM}*
-SPACE     [ \t\n]*
-
-INTEGER   "int"{SPACE}
+INTEGER   "int"
 OPEN      [
 CLOSE     ]
 LESS      <
@@ -40,7 +39,7 @@ ELSE      else
 READ      read
 WRITE     write
 END       ;
-SEPERATOR ,
+SEPARATOR ,
 
 
 BALBRACE  "{"[^{}]*"}"|"{"[^{}]*[:BALBRACE:][^{}]*"}"  /* Should allow for using braces inside of braces (balanced only)*/
@@ -53,6 +52,7 @@ VARCNST   [[:INTEGER:][:DIGIT:]]
 ARRAY     "["[:DIGIT:]"]"
 ASSIGN    [:TYPE:][:SPACE:]"="[:SPACE:][:VARCNST:][:SPACE:]";"
 ARITH     "+"|"-"|"*"|"/"
+ARNIE      [{SPACE} | {SEPARATOR} | {END} | {R_BRACE} | {CLOSE} | {R_BRACK} | {R_PARENTH}]
 
 ARG       ""|"["[:VARCNST:]"]"|"["([:VARCNST:],)*[:VARCNST:]"]"
 COMPARE   [[:VARCNST:][:RELATE:][:VARCNST:]]
@@ -87,15 +87,13 @@ FUNC      [:TYPE:][:SPACE:][:VARIABLE:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALB
 "if"              {printf("IF \n", yytext);}
 "else"            {printf("ELSE \n", yytext);}
 "while"           {printf("WHILE \n", yytext);}
-","               {printf("SEPERATOR \n", yytext);}
+","               {printf("SEPARATOR \n", yytext);}
 
-{DIGIT}+          {printf( "INTEGER \n", yytext ); ++intCount;}
-
-{ALPHA}           {printf("ALPHA \n", yytext);}
-
-{VARIABLE}        {printf("VARIABLE \n", yytext);}
+{DIGIT}           {printf( "DIGIT \n", yytext ); ++intCount;}
 
 {TYPE}            {printf("TYPE \n", yytext);}
+
+{VARIABLE}        {printf("VARIABLE \n", yytext);}
 
 {FUNC}            {printf("FUNC \n", yytext);}
 
