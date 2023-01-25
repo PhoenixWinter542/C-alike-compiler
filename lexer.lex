@@ -40,27 +40,27 @@ END       ;
 SEPARATOR ,
 
 
-BALBRACE  "{"[^{}]*"}"|"{"[^{}]*[:BALBRACE:][^{}]*"}"  /* Should allow for using braces inside of braces (balanced only)*/
-BALPAREN  "("[^()]*")"|"("[^()]*[:BALPAREN:][^()]*")"
-BALBRACK  "["[^\[\]]*"]"|"["[^\[\]]*[:BALBRACK:][^)]*"]"
+BALBRACE  "{"[^{}]*"}"|"{"[^{}]*{BALBRACE}[^{}]*"}"  /* Should allow for using braces inside of braces (balanced only)*/
+BALPAREN  "("[^()]*")"|"("[^()]*{BALPAREN}[^()]*")"
+BALBRACK  "["[^\[\]]*"]"|"["[^\[\]]*{BALBRACK}[^)]*"]"
 
 /* Compound */
 TYPE      {INTEGER}
-VARCNST   [[:INTEGER:][:DIGIT:]]
-ARRAY     "["[:DIGIT:]"]"
-ASSIGN    [:TYPE:][:SPACE:]"="[:SPACE:][:VARCNST:][:SPACE:]";"
+VARCNST   [{VARIABLE}{DIGIT}]
+ARRAY     "["{DIGIT}"]"
+ASSIGN    {VARIABLE}{SPACE}?"="{SPACE}?{VARCNST}{SPACE}?";"
 ARITH     "+"|"-"|"*"|"/"
 ARNIE      {SPACE}|{SEPARATOR}|{END}|{R_BRACE}|{R_BRACK}|{R_PARENTH}
 
-ARG       ""|"["[:VARCNST:]"]"|"["([:VARCNST:],)*[:VARCNST:]"]"
-COMPARE   [[:VARCNST:][:RELATE:][:VARCNST:]]
-DECLARE   ""|[:TYPE:][:SPACE:][:VARCNST:]|([:TYPE:][:SPACE:][:VARCNST:],)*[:TYPE:][:SPACE:][:VARCNST:]
+ARG       ""|"["{VARCNST}"]"|"["({VARCNST},)*{VARCNST}"]"
+COMPARE   [{VARCNST}{RELATE}{VARCNST}]
+DECLARE   ""|{TYPE}{SPACE}{VARCNST}|({TYPE}{SPACE}{VARCNST},)*{TYPE}{SPACE}{VARCNST}
 
 LOOP      "while" | "do while"
 CASE      "if" | "else"
 FILE      "read" | "write"
 COMMENT   "//"[.]*\n|["/*"[.]*"*/"]
-FUNC      [:TYPE:][:SPACE:][:VARIABLE:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACE:]
+FUNC      /*{TYPE}{SPACE}{VARIABLE}{SPACE}?"("{DECLARE}")"{SPACE}?{BALBRACE}*/
 
 %%
 
@@ -92,8 +92,6 @@ FUNC      [:TYPE:][:SPACE:][:VARIABLE:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALB
 {TYPE}            {printf("TYPE \n", yytext);}
 
 {VARIABLE}        {printf("VARIABLE \n", yytext);}
-
-{FUNC}            {printf("FUNC \n", yytext);}
 
 "{"[^}\n]*"}"     /* eat up one-line comments */
 
