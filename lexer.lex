@@ -31,11 +31,18 @@ DIVIDE    /
 WHILE     while
 L_PARENTH (
 R_PARENTH )
+L_BRACK   [
+R_BRACK   ]
+L_BRACE   {
+R_BRACE   }
 IF        if
 ELSE      else
 READ      read
 WRITE     write
 END       ;
+SEPERATOR ,
+
+
 BALBRACE  "{"[^{}]*"}"|"{"[^{}]*[:BALBRACE:][^{}]*"}"  /* Should allow for using braces inside of braces (balanced only)*/
 BALPAREN  "("[^()]*")"|"("[^()]*[:BALPAREN:][^()]*")"
 BALBRACK  "["[^\[\]]*"]"|"["[^\[\]]*[:BALBRACK:][^)]*"]"
@@ -72,14 +79,21 @@ FUNC      [:OBJECT:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACK:]
 "/"               {printf("DIVIDE \n", yytext);}
 "("               {printf("LPARENTH \n", yytext);}
 ")"               {printf("RPARENTH \n", yytext);}
+"["               {printf("LBRACK \n", yytext);}
+"]"               {printf("RBRACK \n", yytext);}
+"{"               {printf("LBRACE \n", yytext);}
+"}"               {printf("RBRACE \n", yytext);}
 ";"               {printf("END \n", yytext);}
 "if"              {printf("IF \n", yytext);}
 "else"            {printf("ELSE \n", yytext);}
 "while"           {printf("WHILE \n", yytext);}
+","               {printf("SEPERATOR \n", yytext);}
 
 {DIGIT}+          {printf( "INTEGER", yytext ); ++intCount;}
 
 {VARIABLE}        {printf("a ");}
+
+{FUNC}            {printf("FUNC \n", yytext);}
 
 "("|")"           {printf( "A parentheses: %s\n", yytext); ++parenCount;}
 
@@ -95,9 +109,9 @@ FUNC      [:OBJECT:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACK:]
 
 int main( void )
 {
-  printf("STRING: %s\n", "[Your String]");
+  /* printf("STRING: %s\n", "[Your String]");
   printf("NUMBER: %d\n", 100);
-  printf("Ctrl+D to quit.\n");
+  printf("Ctrl+D to quit.\n"); */
   yylex();
   /*
   if(0 == failed){
