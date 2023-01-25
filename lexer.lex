@@ -12,10 +12,8 @@ DIGIT     [0-9]+{ARNIE}
 ALPHA     [a-zA-Z]
 ALNUM     [a-zA-Z0-9]+
 SPACE     [ \t\n]+
-VARIABLE  {ALPHA}{ALNUM}*
+VARIABLE  {ALPHA}(_?{ALNUM})*
 INTEGER   "int"
-OPEN      [
-CLOSE     ]
 LESS      <
 GREATER   >
 LTE       <=
@@ -29,11 +27,11 @@ MULTIPLY  *
 DIVIDE    /
 WHILE     while
 L_PARENTH (
-R_PARENTH )
+R_PARENTH \)
 L_BRACK   [
 R_BRACK   ]
 L_BRACE   {
-R_BRACE   }
+R_BRACE   \}
 IF        if
 ELSE      else
 READ      read
@@ -52,7 +50,7 @@ VARCNST   [[:INTEGER:][:DIGIT:]]
 ARRAY     "["[:DIGIT:]"]"
 ASSIGN    [:TYPE:][:SPACE:]"="[:SPACE:][:VARCNST:][:SPACE:]";"
 ARITH     "+"|"-"|"*"|"/"
-ARNIE      [{SPACE} | {SEPARATOR} | {END} | {R_BRACE} | {CLOSE} | {R_BRACK} | {R_PARENTH}]
+ARNIE      {SPACE}|{SEPARATOR}|{END}|{R_BRACE}|{R_BRACK}|{R_PARENTH}
 
 ARG       ""|"["[:VARCNST:]"]"|"["([:VARCNST:],)*[:VARCNST:]"]"
 COMPARE   [[:VARCNST:][:RELATE:][:VARCNST:]]
