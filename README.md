@@ -23,6 +23,9 @@ Compiler Name:  Compilotron <br>
 | [                                   | OPEN                                                                |
 | ]                                   | CLOSE                                                               |
 | =                                   | EQUAL                                                               |
+| <=                                  | LTE                                                                 |
+| >=                                  | GTE                                                                 |
+| !=                                  | NOTEQUAL                                                            |
 | +                                   | ADD                                                                 |
 | -                                   | SUBTRACT                                                            |
 | *                                   | MULTIPLY                                                            |
