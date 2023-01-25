@@ -55,7 +55,7 @@ LOOP      "while" | "do while"
 CASE      "if" | "else"
 FILE      "read" | "write"
 COMMENT   "//"[.]*\n|["/*"[.]*"*/"]
-FUNC      "("[:DECLARE:]")"[:BALBRACK:]*
+FUNC      [:OBJECT:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACK:]
 
 %%
 
