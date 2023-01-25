@@ -7,7 +7,7 @@ Compiler Name:  Compilotron <br>
 | **Language Feature**               	| **Code Example**                                                   	|
 |------------------------------------	|--------------------------------------------------------------------	|
 | Integer scalar variables           	| int x; int y;<br>int test, int test1;                              	|
-| One-dimensional arrays of integers 	| int[] name; int[100] name1;                                        	|
+| One-dimensional arrays of integers 	| int[100] name1;                                        	|
 | Assignment Statements              	| x = 10; int x = 10; int x = a;                                     	|
 | Arithmetic operators               	| a+b   a-b   a*b   a/b                                              	|
 | Relational operators               	| a>b   a<b   a==b   a!=b                                            	|
