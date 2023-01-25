@@ -20,8 +20,8 @@ Compiler Name:  Compilotron <br>
 | ** Symbol in Language**             | **Token Name**                                                      |
 |------------------------------------	|--------------------------------------------------------------------	|
 | int                                 | INTEGER                                                             |
-| [                                   | OPEN                                                                |
-| ]                                   | CLOSE                                                               |
+| [                                   | L_BRACK                                                             |
+| ]                                   | R_BRACK                                                             |
 | =                                   | EQUAL                                                               |
 | <=                                  | LTE                                                                 |
 | >=                                  | GTE                                                                 |
@@ -38,6 +38,9 @@ Compiler Name:  Compilotron <br>
 | read                                | READ                                                                |
 | write                               | WRITE                                                               |
 | ;                                   | END                                                                 |
+| {                                   | L_BRACE                                                             |
+| }                                   | R_BRACE                                                             |
+| ,                                   | SEPARATOR                                                           |
 
 # Miscellaneous
 
