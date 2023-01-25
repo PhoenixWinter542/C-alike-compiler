@@ -14,7 +14,7 @@ ALNUM     [a-zA-Z0-9]+
 VARIABLE  {ALPHA}{ALNUM}*
 SPACE     [ \t\n]*
 
-INTEGER   "int "{VARIABLE}
+INTEGER   "int"{SPACE}
 OPEN      [
 CLOSE     ]
 LESS      <
@@ -48,21 +48,21 @@ BALPAREN  "("[^()]*")"|"("[^()]*[:BALPAREN:][^()]*")"
 BALBRACK  "["[^\[\]]*"]"|"["[^\[\]]*[:BALBRACK:][^)]*"]"
 
 /* Compound */
-OBJECT    [[:INTEGER:]]
+TYPE      {INTEGER}
 VARCNST   [[:INTEGER:][:DIGIT:]]
 ARRAY     "["[:DIGIT:]"]"
-ASSIGN    [:OBJECT:][:SPACE:]"="[:SPACE:][:VARCNST:][:SPACE:]";"
+ASSIGN    [:TYPE:][:SPACE:]"="[:SPACE:][:VARCNST:][:SPACE:]";"
 ARITH     "+"|"-"|"*"|"/"
 
 ARG       ""|"["[:VARCNST:]"]"|"["([:VARCNST:],)*[:VARCNST:]"]"
 COMPARE   [[:VARCNST:][:RELATE:][:VARCNST:]]
-DECLARE   ""|[:OBJECT:][:SPACE:][:VARCNST:]|([:OBJECT:][:SPACE:][:VARCNST:],)*[:OBJECT:][:SPACE:][:VARCNST:]
+DECLARE   ""|[:TYPE:][:SPACE:][:VARCNST:]|([:TYPE:][:SPACE:][:VARCNST:],)*[:TYPE:][:SPACE:][:VARCNST:]
 
 LOOP      "while" | "do while"
 CASE      "if" | "else"
 FILE      "read" | "write"
 COMMENT   "//"[.]*\n|["/*"[.]*"*/"]
-FUNC      [:OBJECT:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACK:]
+FUNC      [:TYPE:][:SPACE:][:VARIABLE:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACE:]
 
 %%
 
@@ -91,13 +91,13 @@ FUNC      [:OBJECT:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACK:]
 
 {DIGIT}+          {printf( "INTEGER \n", yytext ); ++intCount;}
 
-{VARIABLE}        {printf("a \n", yytext);}
+{ALPHA}           {printf("ALPHA \n", yytext);}
+
+{VARIABLE}        {printf("VARIABLE \n", yytext);}
+
+{TYPE}            {printf("TYPE \n", yytext);}
 
 {FUNC}            {printf("FUNC \n", yytext);}
-
-"("|")"           {printf( "A parentheses: %s\n", yytext); ++parenCount;}
-
-"="               {printf( "An equal sign: %s\n", yytext); ++eqCount;}
 
 "{"[^}\n]*"}"     /* eat up one-line comments */
 
