@@ -89,9 +89,9 @@ FUNC      [:OBJECT:][:SPACE:]"("[:DECLARE:]")"[:SPACE:][:BALBRACK:]
 "while"           {printf("WHILE \n", yytext);}
 ","               {printf("SEPERATOR \n", yytext);}
 
-{DIGIT}+          {printf( "INTEGER", yytext ); ++intCount;}
+{DIGIT}+          {printf( "INTEGER \n", yytext ); ++intCount;}
 
-{VARIABLE}        {printf("a ");}
+{VARIABLE}        {printf("a \n", yytext);}
 
 {FUNC}            {printf("FUNC \n", yytext);}
 
