@@ -36,9 +36,9 @@ ELSE      else
 READ      read
 WRITE     write
 END       ;
-BALBRACE  "{"[^{}]*"}"|"{"[^{}]*[:BALBRACE:][^{}]*"}"  /* Should allow for using braces inside of brackets (balanced only)*/
+BALBRACE  "{"[^{}]*"}"|"{"[^{}]*[:BALBRACE:][^{}]*"}"  /* Should allow for using braces inside of braces (balanced only)*/
 BALPAREN  "("[^()]*")"|"("[^()]*[:BALPAREN:][^()]*")"
-BALBRACE  "["[^\[\]]*"]"|"["[^\[\]]*[:BALPAREN:][^)]*"]"
+BALBRACK  "["[^\[\]]*"]"|"["[^\[\]]*[:BALBRACK:][^)]*"]"
 
 /* Compound */
 OBJECT    [[:INTEGER:]]
@@ -55,7 +55,7 @@ LOOP      "while" | "do while"
 CASE      "if" | "else"
 FILE      "read" | "write"
 COMMENT   "//"[.]*\n|["/*"[.]*"*/"]
-FUNC      "("[:DECLARE:]")""{"[:BALBRACK:]*"}"
+FUNC      "("[:DECLARE:]")"[:BALBRACK:]*
 
 %%
 
