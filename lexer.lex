@@ -5,6 +5,7 @@ int parenCount = 0;
 int eqCount = 0;
 int failed = 0;
 int lineCount = 1;
+int positionCount = 1;
 %}
 
 /* BASIC */
@@ -66,43 +67,43 @@ COMMENT   "//"[.]*\n|["/*"[.]*"*/"]
 FUNC      /*{TYPE}{SPACE}{VARIABLE}{SPACE}?"("{DECLARE}")"{SPACE}?{BALBRACE}*/
 
 %%
-"<"               {printf("LESS \n", yytext);}
-">"               {printf("GREATER \n", yytext);}
-"<="              {printf("LTE \n", yytext);}
-">="              {printf("GTE \n", yytext);}
-"!="              {printf("NOTEQUAL \n", yytext);}
-"=="              {printf("EQUAL \n", yytext);}
-"="               {printf("ASSIGN \n", yytext);}
-"+"               {printf("ADD \n", yytext);}
-"-"               {printf("SUBTRACT \n", yytext);}
-"*"               {printf("MULTIPLY \n", yytext);}
-"/"               {printf("DIVIDE \n", yytext);}
-"("               {printf("LPARENTH \n", yytext);}
-")"               {printf("RPARENTH \n", yytext);}
-"["               {printf("LBRACK \n", yytext);}
-"]"               {printf("RBRACK \n", yytext);}
-"{"               {printf("LBRACE \n", yytext);}
-"}"               {printf("RBRACE \n", yytext);}
-";"               {printf("END \n", yytext);}
-"if"              {printf("IF \n", yytext);}
-"else"            {printf("ELSE \n", yytext);}
-"while"           {printf("WHILE \n", yytext);}
-","               {printf("SEPARATOR \n", yytext);}
+"<"               {printf("LESS \n", yytext); positionCount += yyleng;}
+">"               {printf("GREATER \n", yytext); positionCount += yyleng;}
+"<="              {printf("LTE \n", yytext); positionCount += yyleng;}
+">="              {printf("GTE \n", yytext); positionCount += yyleng;}
+"!="              {printf("NOTEQUAL \n", yytext); positionCount += yyleng;}
+"=="              {printf("EQUAL \n", yytext); positionCount += yyleng;}
+"="               {printf("ASSIGN \n", yytext); positionCount += yyleng;}
+"+"               {printf("ADD \n", yytext); positionCount += yyleng;}
+"-"               {printf("SUBTRACT \n", yytext); positionCount += yyleng;}
+"*"               {printf("MULTIPLY \n", yytext); positionCount += yyleng;}
+"/"               {printf("DIVIDE \n", yytext); positionCount += yyleng;}
+"("               {printf("LPARENTH \n", yytext); positionCount += yyleng;}
+")"               {printf("RPARENTH \n", yytext); positionCount += yyleng;}
+"["               {printf("LBRACK \n", yytext); positionCount += yyleng;}
+"]"               {printf("RBRACK \n", yytext); positionCount += yyleng;}
+"{"               {printf("LBRACE \n", yytext); positionCount += yyleng;}
+"}"               {printf("RBRACE \n", yytext); positionCount += yyleng;}
+";"               {printf("END \n", yytext); positionCount += yyleng;}
+"if"              {printf("IF \n", yytext); positionCount += yyleng;}
+"else"            {printf("ELSE \n", yytext); positionCount += yyleng;}
+"while"           {printf("WHILE \n", yytext); positionCount += yyleng;}
+","               {printf("SEPARATOR \n", yytext); positionCount += yyleng;}
 {NEWLINE}         {printf("NEWLINE \n", yytext); lineCount++;}
 {RETURN}          {printf("RETURN \n", yytext);}
 
 
-{DIGIT}           {printf( "DIGIT \n", yytext ); ++intCount;}
+{DIGIT}           {printf( "DIGIT \n", yytext ); positionCount += yyleng; ++intCount;}
 
-{TYPE}            {printf("TYPE \n", yytext);}
+{TYPE}            {printf("TYPE \n", yytext); positionCount += yyleng;}
 
-{VARIABLE}        {printf("VARIABLE \n", yytext);}
+{VARIABLE}        {printf("VARIABLE \n", yytext); positionCount += yyleng;}
 
 "{"[^}\n]*"}"     /* eat up one-line comments */
 
 [ \t]+            /* eat up whitespace */
 
-.                 {printf( "Unrecognized character: %s at line %d\n", yytext, lineCount); failed = 1; return 0;}
+.                 {printf( "Unrecognized character: %s at line %d, position %d\n", yytext, lineCount, positionCount); failed = 1; return 0;}
 
 %%
 
