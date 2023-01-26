@@ -4,6 +4,7 @@ int opCount = 0;
 int parenCount = 0;
 int eqCount = 0;
 int failed = 0;
+int lineCount = 1;
 %}
 
 /* BASIC */
@@ -38,6 +39,8 @@ READ      read
 WRITE     write
 END       ;
 SEPARATOR ,
+RETURN    return
+NEWLINE   "\n"
 
 
 BALBRACE  "{"[^{}]*"}"|"{"[^{}]*{BALBRACE}[^{}]*"}"  /* Should allow for using braces inside of braces (balanced only)*/
@@ -63,7 +66,6 @@ COMMENT   "//"[.]*\n|["/*"[.]*"*/"]
 FUNC      /*{TYPE}{SPACE}{VARIABLE}{SPACE}?"("{DECLARE}")"{SPACE}?{BALBRACE}*/
 
 %%
-
 "<"               {printf("LESS \n", yytext);}
 ">"               {printf("GREATER \n", yytext);}
 "<="              {printf("LTE \n", yytext);}
@@ -86,6 +88,9 @@ FUNC      /*{TYPE}{SPACE}{VARIABLE}{SPACE}?"("{DECLARE}")"{SPACE}?{BALBRACE}*/
 "else"            {printf("ELSE \n", yytext);}
 "while"           {printf("WHILE \n", yytext);}
 ","               {printf("SEPARATOR \n", yytext);}
+{NEWLINE}         {printf("NEWLINE \n", yytext); lineCount++;}
+{RETURN}          {printf("RETURN \n", yytext);}
+
 
 {DIGIT}           {printf( "DIGIT \n", yytext ); ++intCount;}
 
@@ -95,9 +100,9 @@ FUNC      /*{TYPE}{SPACE}{VARIABLE}{SPACE}?"("{DECLARE}")"{SPACE}?{BALBRACE}*/
 
 "{"[^}\n]*"}"     /* eat up one-line comments */
 
-[ \t\n]+          /* eat up whitespace */
+[ \t]+            /* eat up whitespace */
 
-.           {printf( "Unrecognized character: %s\n", yytext ); failed = 1; return 0;}
+.                 {printf( "Unrecognized character: %s at line %d\n", yytext, lineCount); failed = 1; return 0;}
 
 %%
 
