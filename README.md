@@ -48,6 +48,6 @@ Compiler Name:  Compilotron <br>
     * Variable names must start with a digit and cannot end with an underscore.
     * Variable names cannot be a keyword e.g. "if", "int".
     * Variable names cannot include special characters e.g. '"[({,.
-    * Valid variable names: var, test1, longer_variable1_name43
+    * Valid variable names include: var, test1, longer_variable1_name43
 * Case sensitive:         yes <br>
 * Whitespaces ignored:    yes <br>
