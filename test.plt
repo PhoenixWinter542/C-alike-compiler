@@ -1,1 +1,2 @@
-2;
+int var;
+int 2var;

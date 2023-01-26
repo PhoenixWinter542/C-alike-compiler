@@ -90,7 +90,7 @@ FUNC      /*{TYPE}{SPACE}{VARIABLE}{SPACE}?"("{DECLARE}")"{SPACE}?{BALBRACE}*/
 "while"           {printf("WHILE \n", yytext); positionCount += yyleng;}
 ","               {printf("SEPARATOR \n", yytext); positionCount += yyleng;}
 {NEWLINE}         {printf("NEWLINE \n", yytext); lineCount++; positionCount = 1;}
-{RETURN}          {printf("RETURN \n", yytext);}
+{RETURN}          {printf("RETURN \n", yytext); positionCount += yyleng;}
 
 
 {DIGIT}           {printf( "DIGIT \n", yytext ); positionCount += yyleng; ++intCount;}
