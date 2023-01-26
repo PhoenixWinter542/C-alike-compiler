@@ -89,7 +89,7 @@ FUNC      /*{TYPE}{SPACE}{VARIABLE}{SPACE}?"("{DECLARE}")"{SPACE}?{BALBRACE}*/
 "else"            {printf("ELSE \n", yytext); positionCount += yyleng;}
 "while"           {printf("WHILE \n", yytext); positionCount += yyleng;}
 ","               {printf("SEPARATOR \n", yytext); positionCount += yyleng;}
-{NEWLINE}         {printf("NEWLINE \n", yytext); lineCount++;}
+{NEWLINE}         {printf("NEWLINE \n", yytext); lineCount++; positionCount = 1;}
 {RETURN}          {printf("RETURN \n", yytext);}
 
 
