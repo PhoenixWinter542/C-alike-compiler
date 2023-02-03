@@ -21,6 +21,7 @@ int_const	{digit}+
 "/"		{ yylval.op_val = new std::string(yytext); return DIV; }
 "("		{ yylval.op_val = new std::string(yytext); return L_PAREN; }
 ")"		{ yylval.op_val = new std::string(yytext); return R_PAREN; }
+"="		{ yylval.op_val = new std::string(yytext); return EQUAL; }
 
 [ \t]*		{}
 [\n]		{ yylineno++;	}

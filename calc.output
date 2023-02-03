@@ -3,7 +3,7 @@ Grammar
     0 $accept: input $end
 
     1 input: %empty
-    2      | add
+    2      | add EQUAL
 
     3 add: add PLUS sub
     4    | sub
@@ -34,25 +34,26 @@ MINUS (261) 5
 DIV (262) 9
 L_PAREN (263) 11
 R_PAREN (264) 11
+EQUAL (265) 2
 
 
 Nonterminals, with rules where they appear
 
-$accept (10)
+$accept (11)
     on left: 0
-input (11)
+input (12)
     on left: 1 2, on right: 0
-add (12)
+add (13)
     on left: 3 4, on right: 2 3 11
-sub (13)
+sub (14)
     on left: 5 6, on right: 3 4 5
-mult (14)
+mult (15)
     on left: 7 8, on right: 5 6 7
-div (15)
+div (16)
     on left: 9 10, on right: 7 8 9
-paren (16)
+paren (17)
     on left: 11 12, on right: 10
-term (17)
+term (18)
     on left: 13, on right: 9 12
 
 
@@ -105,12 +106,11 @@ State 3
 
 State 4
 
-    2 input: add .
+    2 input: add . EQUAL
     3 add: add . PLUS sub
 
-    PLUS  shift, and go to state 12
-
-    $default  reduce using rule 2 (input)
+    PLUS   shift, and go to state 12
+    EQUAL  shift, and go to state 13
 
 
 State 5
@@ -118,7 +118,7 @@ State 5
     4 add: sub .
     5 sub: sub . MINUS mult
 
-    MINUS  shift, and go to state 13
+    MINUS  shift, and go to state 14
 
     $default  reduce using rule 4 (add)
 
@@ -128,7 +128,7 @@ State 6
     6 sub: mult .
     7 mult: mult . MULT div
 
-    MULT  shift, and go to state 14
+    MULT  shift, and go to state 15
 
     $default  reduce using rule 6 (sub)
 
@@ -138,7 +138,7 @@ State 7
     8 mult: div .
     9 div: div . DIV term
 
-    DIV  shift, and go to state 15
+    DIV  shift, and go to state 16
 
     $default  reduce using rule 8 (mult)
 
@@ -163,7 +163,7 @@ State 10
    11 paren: L_PAREN add . R_PAREN
 
     PLUS     shift, and go to state 12
-    R_PAREN  shift, and go to state 16
+    R_PAREN  shift, and go to state 17
 
 
 State 11
@@ -180,7 +180,7 @@ State 12
     NUMBER   shift, and go to state 1
     L_PAREN  shift, and go to state 2
 
-    sub    go to state 17
+    sub    go to state 18
     mult   go to state 6
     div    go to state 7
     paren  go to state 8
@@ -189,76 +189,83 @@ State 12
 
 State 13
 
+    2 input: add EQUAL .
+
+    $default  reduce using rule 2 (input)
+
+
+State 14
+
     5 sub: sub MINUS . mult
 
     NUMBER   shift, and go to state 1
     L_PAREN  shift, and go to state 2
 
-    mult   go to state 18
+    mult   go to state 19
     div    go to state 7
-    paren  go to state 8
-    term   go to state 9
-
-
-State 14
-
-    7 mult: mult MULT . div
-
-    NUMBER   shift, and go to state 1
-    L_PAREN  shift, and go to state 2
-
-    div    go to state 19
     paren  go to state 8
     term   go to state 9
 
 
 State 15
 
+    7 mult: mult MULT . div
+
+    NUMBER   shift, and go to state 1
+    L_PAREN  shift, and go to state 2
+
+    div    go to state 20
+    paren  go to state 8
+    term   go to state 9
+
+
+State 16
+
     9 div: div DIV . term
 
     NUMBER  shift, and go to state 1
 
-    term  go to state 20
+    term  go to state 21
 
 
-State 16
+State 17
 
    11 paren: L_PAREN add R_PAREN .
 
     $default  reduce using rule 11 (paren)
 
 
-State 17
+State 18
 
     3 add: add PLUS sub .
     5 sub: sub . MINUS mult
 
-    MINUS  shift, and go to state 13
+    MINUS  shift, and go to state 14
 
     $default  reduce using rule 3 (add)
 
 
-State 18
+State 19
 
     5 sub: sub MINUS mult .
     7 mult: mult . MULT div
 
-    MULT  shift, and go to state 14
+    MULT  shift, and go to state 15
 
     $default  reduce using rule 5 (sub)
 
 
-State 19
+State 20
 
     7 mult: mult MULT div .
     9 div: div . DIV term
 
-    DIV  shift, and go to state 15
+    DIV  shift, and go to state 16
 
     $default  reduce using rule 7 (mult)
 
 
-State 20
+State 21
 
     9 div: div DIV term .
 

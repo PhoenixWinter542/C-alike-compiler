@@ -51,7 +51,8 @@ extern int yydebug;
     MINUS = 261,
     DIV = 262,
     L_PAREN = 263,
-    R_PAREN = 264
+    R_PAREN = 264,
+    EQUAL = 265
   };
 #endif
 
@@ -65,7 +66,7 @@ union YYSTYPE
   int		int_val;
   string*	op_val;
 
-#line 69 "calc.tab.h" /* yacc.c:1909  */
+#line 70 "calc.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

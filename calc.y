@@ -29,30 +29,31 @@ int yylex(void);
 %left DIV
 %left L_PAREN
 %left R_PAREN
+%left EQUAL
 
 %%
 
 input:		/* empty */
-		| add	{ cout << "Result: " << $1 << endl; }
+		| add EQUAL	{ cout << "Result: " << $1 << endl; }
 		;
 
-add:    add PLUS sub	{ $$ = $1 + $3; }
+add:    add PLUS sub	{ $$ = $1 + $3; cout << "PLUS" << endl; }
     | sub
 		;
 
-sub:    sub MINUS mult { $$ = $1 - $3; }
+sub:    sub MINUS mult { $$ = $1 - $3; cout << "MINUS" << endl; }
     | mult
     ;
 
-mult:   mult MULT div { $$ = $1 * $3; }
+mult:   mult MULT div { $$ = $1 * $3; cout << "MULT" << endl; }
     | div
     ;
 
-div:    div DIV term { $$ = $1 / $3; }
+div:    div DIV term { $$ = $1 / $3; cout << "DIV" << endl; }
     | paren
     ;
 
-paren:  L_PAREN add R_PAREN { $$ = $2; }
+paren:  L_PAREN add R_PAREN { $$ = $2; cout << "PAREN " << endl; }
     | term
 
 term:   NUMBER { $$ = $1; }
