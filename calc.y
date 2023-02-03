@@ -14,21 +14,49 @@ int yylex(void);
 
 %start	input 
 
-%token	<int_val>	INTEGER_LITERAL
-%type	<int_val>	exp
+%token	<int_val>	NUMBER
+
+%type	<int_val>	add
+%type	<int_val>	sub
+%type	<int_val>	mult
+%type	<int_val>	div
+%type <int_val> paren
+%type <int_val> term
+
 %left	PLUS
 %left	MULT
+%left MINUS
+%left DIV
+%left L_PAREN
+%left R_PAREN
 
 %%
 
 input:		/* empty */
-		| exp	{ cout << "Result: " << $1 << endl; }
+		| add	{ cout << "Result: " << $1 << endl; }
 		;
 
-exp:		INTEGER_LITERAL	{ $$ = $1; }
-		| exp PLUS exp	{ $$ = $1 + $3; }
-		| exp MULT exp	{ $$ = $1 * $3; }
+add:    add PLUS sub	{ $$ = $1 + $3; }
+    | sub
 		;
+
+sub:    sub MINUS mult { $$ = $1 - $3; }
+    | mult
+    ;
+
+mult:   mult MULT div { $$ = $1 * $3; }
+    | div
+    ;
+
+div:    div DIV term { $$ = $1 / $3; }
+    | paren
+    ;
+
+paren:  L_PAREN add R_PAREN { $$ = $2; }
+    | term
+
+term:   NUMBER { $$ = $1; }
+    ;
 
 %%
 

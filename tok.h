@@ -45,9 +45,13 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INTEGER_LITERAL = 258,
+    NUMBER = 258,
     PLUS = 259,
-    MULT = 260
+    MULT = 260,
+    MINUS = 261,
+    DIV = 262,
+    L_PAREN = 263,
+    R_PAREN = 264
   };
 #endif
 
@@ -61,7 +65,7 @@ union YYSTYPE
   int		int_val;
   string*	op_val;
 
-#line 65 "calc.tab.h" /* yacc.c:1909  */
+#line 69 "calc.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
