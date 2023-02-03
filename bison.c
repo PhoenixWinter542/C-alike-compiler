@@ -67,8 +67,12 @@
 #include "heading.h"
 int yyerror(char *s);
 int yylex(void);
+int intCount = 0;
+int opCount = 0;
+int parenCount = 0;
+int equalCount = 0;
 
-#line 72 "calc.tab.c" /* yacc.c:339  */
+#line 76 "calc.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -119,12 +123,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 10 "calc.y" /* yacc.c:355  */
+#line 14 "calc.y" /* yacc.c:355  */
 
   int		int_val;
   string*	op_val;
 
-#line 128 "calc.tab.c" /* yacc.c:355  */
+#line 132 "calc.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -141,7 +145,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 145 "calc.tab.c" /* yacc.c:358  */
+#line 149 "calc.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -439,8 +443,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    36,    36,    37,    40,    41,    44,    45,    48,    49,
-      52,    53,    56,    57,    59
+       0,    40,    40,    41,    44,    45,    48,    49,    52,    53,
+      56,    57,    60,    61,    63
 };
 #endif
 
@@ -1220,49 +1224,49 @@ yyreduce:
   switch (yyn)
     {
         case 3:
-#line 37 "calc.y" /* yacc.c:1646  */
-    { cout << "Result: " << (yyvsp[-1].int_val) << endl; }
-#line 1226 "calc.tab.c" /* yacc.c:1646  */
+#line 41 "calc.y" /* yacc.c:1646  */
+    { cout << "Result: " << (yyvsp[-1].int_val) << "\nIntegers: " << intCount << "\nOperators: " << opCount << "\nParentheses: " << parenCount  << "\nEqual Signs: " << ++equalCount << endl; }
+#line 1230 "calc.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 40 "calc.y" /* yacc.c:1646  */
-    { (yyval.int_val) = (yyvsp[-2].int_val) + (yyvsp[0].int_val); cout << "PLUS" << endl; }
-#line 1232 "calc.tab.c" /* yacc.c:1646  */
+#line 44 "calc.y" /* yacc.c:1646  */
+    { (yyval.int_val) = (yyvsp[-2].int_val) + (yyvsp[0].int_val); cout << "PLUS" << endl; ++opCount; }
+#line 1236 "calc.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 44 "calc.y" /* yacc.c:1646  */
-    { (yyval.int_val) = (yyvsp[-2].int_val) - (yyvsp[0].int_val); cout << "MINUS" << endl; }
-#line 1238 "calc.tab.c" /* yacc.c:1646  */
+#line 48 "calc.y" /* yacc.c:1646  */
+    { (yyval.int_val) = (yyvsp[-2].int_val) - (yyvsp[0].int_val); cout << "MINUS" << endl; ++opCount; }
+#line 1242 "calc.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 48 "calc.y" /* yacc.c:1646  */
-    { (yyval.int_val) = (yyvsp[-2].int_val) * (yyvsp[0].int_val); cout << "MULT" << endl; }
-#line 1244 "calc.tab.c" /* yacc.c:1646  */
+#line 52 "calc.y" /* yacc.c:1646  */
+    { (yyval.int_val) = (yyvsp[-2].int_val) * (yyvsp[0].int_val); cout << "MULT" << endl; ++opCount; }
+#line 1248 "calc.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 52 "calc.y" /* yacc.c:1646  */
-    { (yyval.int_val) = (yyvsp[-2].int_val) / (yyvsp[0].int_val); cout << "DIV" << endl; }
-#line 1250 "calc.tab.c" /* yacc.c:1646  */
+#line 56 "calc.y" /* yacc.c:1646  */
+    { (yyval.int_val) = (yyvsp[-2].int_val) / (yyvsp[0].int_val); cout << "DIV" << endl; ++opCount; }
+#line 1254 "calc.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 56 "calc.y" /* yacc.c:1646  */
-    { (yyval.int_val) = (yyvsp[-1].int_val); cout << "PAREN " << endl; }
-#line 1256 "calc.tab.c" /* yacc.c:1646  */
+#line 60 "calc.y" /* yacc.c:1646  */
+    { (yyval.int_val) = (yyvsp[-1].int_val); cout << "PAREN " << endl; ++ parenCount; }
+#line 1260 "calc.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 59 "calc.y" /* yacc.c:1646  */
-    { (yyval.int_val) = (yyvsp[0].int_val); }
-#line 1262 "calc.tab.c" /* yacc.c:1646  */
+#line 63 "calc.y" /* yacc.c:1646  */
+    { (yyval.int_val) = (yyvsp[0].int_val); ++intCount; }
+#line 1266 "calc.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1266 "calc.tab.c" /* yacc.c:1646  */
+#line 1270 "calc.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1490,7 +1494,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 62 "calc.y" /* yacc.c:1906  */
+#line 66 "calc.y" /* yacc.c:1906  */
 
 
 int yyerror(string s)

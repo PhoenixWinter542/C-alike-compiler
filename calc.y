@@ -5,6 +5,10 @@
 #include "heading.h"
 int yyerror(char *s);
 int yylex(void);
+int intCount = 0;
+int opCount = 0;
+int parenCount = 0;
+int equalCount = 0;
 %}
 
 %union{
@@ -34,29 +38,29 @@ int yylex(void);
 %%
 
 input:		/* empty */
-		| add EQUAL	{ cout << "Result: " << $1 << endl; }
+		| add EQUAL	{ cout << "Result: " << $1 << "\nIntegers: " << intCount << "\nOperators: " << opCount << "\nParentheses: " << parenCount  << "\nEqual Signs: " << ++equalCount << endl; }
 		;
 
-add:    add PLUS sub	{ $$ = $1 + $3; cout << "PLUS" << endl; }
+add:    add PLUS sub	{ $$ = $1 + $3; cout << "PLUS" << endl; ++opCount; }
     | sub
 		;
 
-sub:    sub MINUS mult { $$ = $1 - $3; cout << "MINUS" << endl; }
+sub:    sub MINUS mult { $$ = $1 - $3; cout << "MINUS" << endl; ++opCount; }
     | mult
     ;
 
-mult:   mult MULT div { $$ = $1 * $3; cout << "MULT" << endl; }
+mult:   mult MULT div { $$ = $1 * $3; cout << "MULT" << endl; ++opCount; }
     | div
     ;
 
-div:    div DIV term { $$ = $1 / $3; cout << "DIV" << endl; }
+div:    div DIV term { $$ = $1 / $3; cout << "DIV" << endl; ++opCount; }
     | paren
     ;
 
-paren:  L_PAREN add R_PAREN { $$ = $2; cout << "PAREN " << endl; }
+paren:  L_PAREN add R_PAREN { $$ = $2; cout << "PAREN " << endl; ++ parenCount; }
     | term
 
-term:   NUMBER { $$ = $1; }
+term:   NUMBER { $$ = $1; ++intCount; }
     ;
 
 %%
