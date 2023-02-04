@@ -778,19 +778,21 @@ YY_RULE_SETUP
 #line 27 "calc.lex"
 { yylineno++;	}
 	YY_BREAK
+case YY_STATE_EOF(INITIAL):
+#line 29 "calc.lex"
+{ exit(1); }
+	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 29 "calc.lex"
-{ std::cerr << "SCANNER "; yyerror(""); exit(1);	}
+#line 31 "calc.lex"
+{ std::cerr << "SCANNER "; yyerror("Unrecognized character"); exit(1);	}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 31 "calc.lex"
+#line 33 "calc.lex"
 ECHO;
 	YY_BREAK
-#line 792 "lex.yy.c"
-case YY_STATE_EOF(INITIAL):
-	yyterminate();
+#line 796 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1782,4 +1784,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 31 "calc.lex"
+#line 33 "calc.lex"

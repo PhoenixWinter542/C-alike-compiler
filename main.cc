@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     return( 1 );
   }
   
-  yyparse();
+  while(0 == yyparse());
 
   return 0;
 }

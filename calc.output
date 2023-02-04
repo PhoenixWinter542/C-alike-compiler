@@ -1,39 +1,51 @@
+State 18 conflicts: 5 reduce/reduce
+State 20 conflicts: 2 reduce/reduce
+State 21 conflicts: 3 reduce/reduce
+State 22 conflicts: 4 reduce/reduce
+
+
 Grammar
 
     0 $accept: input $end
 
     1 input: %empty
     2      | add EQUAL
+    3      | add
 
-    3 add: add PLUS sub
-    4    | sub
+    4 add: add PLUS sub
+    5    | sub
+    6    | add PLUS
 
-    5 sub: sub MINUS mult
-    6    | mult
+    7 sub: sub MINUS mult
+    8    | mult
+    9    | sub MINUS
 
-    7 mult: mult MULT div
-    8     | div
+   10 mult: mult MULT div
+   11     | div
+   12     | mult MULT
 
-    9 div: div DIV term
-   10    | paren
+   13 div: div DIV term
+   14    | paren
+   15    | div DIV
 
-   11 paren: L_PAREN add R_PAREN
-   12      | term
+   16 paren: L_PAREN add R_PAREN
+   17      | term
+   18      | add R_PAREN
 
-   13 term: NUMBER
+   19 term: NUMBER
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-NUMBER (258) 13
-PLUS (259) 3
-MULT (260) 7
-MINUS (261) 5
-DIV (262) 9
-L_PAREN (263) 11
-R_PAREN (264) 11
+NUMBER (258) 19
+PLUS (259) 4 6
+MULT (260) 10 12
+MINUS (261) 7 9
+DIV (262) 13 15
+L_PAREN (263) 16
+R_PAREN (264) 16 18
 EQUAL (265) 2
 
 
@@ -42,19 +54,19 @@ Nonterminals, with rules where they appear
 $accept (11)
     on left: 0
 input (12)
-    on left: 1 2, on right: 0
+    on left: 1 2 3, on right: 0
 add (13)
-    on left: 3 4, on right: 2 3 11
+    on left: 4 5 6, on right: 2 3 4 6 16 18
 sub (14)
-    on left: 5 6, on right: 3 4 5
+    on left: 7 8 9, on right: 4 5 7 9
 mult (15)
-    on left: 7 8, on right: 5 6 7
+    on left: 10 11 12, on right: 7 8 10 12
 div (16)
-    on left: 9 10, on right: 7 8 9
+    on left: 13 14 15, on right: 10 11 13 15
 paren (17)
-    on left: 11 12, on right: 10
+    on left: 16 17 18, on right: 14
 term (18)
-    on left: 13, on right: 9 12
+    on left: 19, on right: 13 17
 
 
 State 0
@@ -77,14 +89,14 @@ State 0
 
 State 1
 
-   13 term: NUMBER .
+   19 term: NUMBER .
 
-    $default  reduce using rule 13 (term)
+    $default  reduce using rule 19 (term)
 
 
 State 2
 
-   11 paren: L_PAREN . add R_PAREN
+   16 paren: L_PAREN . add R_PAREN
 
     NUMBER   shift, and go to state 1
     L_PAREN  shift, and go to state 2
@@ -107,63 +119,74 @@ State 3
 State 4
 
     2 input: add . EQUAL
-    3 add: add . PLUS sub
+    3      | add .
+    4 add: add . PLUS sub
+    6    | add . PLUS
+   18 paren: add . R_PAREN
 
-    PLUS   shift, and go to state 12
-    EQUAL  shift, and go to state 13
+    PLUS     shift, and go to state 12
+    R_PAREN  shift, and go to state 13
+    EQUAL    shift, and go to state 14
+
+    $default  reduce using rule 3 (input)
 
 
 State 5
 
-    4 add: sub .
-    5 sub: sub . MINUS mult
+    5 add: sub .
+    7 sub: sub . MINUS mult
+    9    | sub . MINUS
 
-    MINUS  shift, and go to state 14
+    MINUS  shift, and go to state 15
 
-    $default  reduce using rule 4 (add)
+    $default  reduce using rule 5 (add)
 
 
 State 6
 
-    6 sub: mult .
-    7 mult: mult . MULT div
+    8 sub: mult .
+   10 mult: mult . MULT div
+   12     | mult . MULT
 
-    MULT  shift, and go to state 15
+    MULT  shift, and go to state 16
 
-    $default  reduce using rule 6 (sub)
+    $default  reduce using rule 8 (sub)
 
 
 State 7
 
-    8 mult: div .
-    9 div: div . DIV term
+   11 mult: div .
+   13 div: div . DIV term
+   15    | div . DIV
 
-    DIV  shift, and go to state 16
+    DIV  shift, and go to state 17
 
-    $default  reduce using rule 8 (mult)
+    $default  reduce using rule 11 (mult)
 
 
 State 8
 
-   10 div: paren .
+   14 div: paren .
 
-    $default  reduce using rule 10 (div)
+    $default  reduce using rule 14 (div)
 
 
 State 9
 
-   12 paren: term .
+   17 paren: term .
 
-    $default  reduce using rule 12 (paren)
+    $default  reduce using rule 17 (paren)
 
 
 State 10
 
-    3 add: add . PLUS sub
-   11 paren: L_PAREN add . R_PAREN
+    4 add: add . PLUS sub
+    6    | add . PLUS
+   16 paren: L_PAREN add . R_PAREN
+   18      | add . R_PAREN
 
     PLUS     shift, and go to state 12
-    R_PAREN  shift, and go to state 17
+    R_PAREN  shift, and go to state 18
 
 
 State 11
@@ -175,12 +198,16 @@ State 11
 
 State 12
 
-    3 add: add PLUS . sub
+    4 add: add PLUS . sub
+    6    | add PLUS .
 
     NUMBER   shift, and go to state 1
     L_PAREN  shift, and go to state 2
 
-    sub    go to state 18
+    $default  reduce using rule 6 (add)
+
+    add    go to state 19
+    sub    go to state 20
     mult   go to state 6
     div    go to state 7
     paren  go to state 8
@@ -189,84 +216,150 @@ State 12
 
 State 13
 
+   18 paren: add R_PAREN .
+
+    $default  reduce using rule 18 (paren)
+
+
+State 14
+
     2 input: add EQUAL .
 
     $default  reduce using rule 2 (input)
 
 
-State 14
-
-    5 sub: sub MINUS . mult
-
-    NUMBER   shift, and go to state 1
-    L_PAREN  shift, and go to state 2
-
-    mult   go to state 19
-    div    go to state 7
-    paren  go to state 8
-    term   go to state 9
-
-
 State 15
 
-    7 mult: mult MULT . div
+    7 sub: sub MINUS . mult
+    9    | sub MINUS .
 
     NUMBER   shift, and go to state 1
     L_PAREN  shift, and go to state 2
 
-    div    go to state 20
+    $default  reduce using rule 9 (sub)
+
+    add    go to state 19
+    sub    go to state 5
+    mult   go to state 21
+    div    go to state 7
     paren  go to state 8
     term   go to state 9
 
 
 State 16
 
-    9 div: div DIV . term
+   10 mult: mult MULT . div
+   12     | mult MULT .
 
-    NUMBER  shift, and go to state 1
+    NUMBER   shift, and go to state 1
+    L_PAREN  shift, and go to state 2
 
-    term  go to state 21
+    $default  reduce using rule 12 (mult)
+
+    add    go to state 19
+    sub    go to state 5
+    mult   go to state 6
+    div    go to state 22
+    paren  go to state 8
+    term   go to state 9
 
 
 State 17
 
-   11 paren: L_PAREN add R_PAREN .
+   13 div: div DIV . term
+   15    | div DIV .
 
-    $default  reduce using rule 11 (paren)
+    NUMBER  shift, and go to state 1
+
+    $default  reduce using rule 15 (div)
+
+    term  go to state 23
 
 
 State 18
 
-    3 add: add PLUS sub .
-    5 sub: sub . MINUS mult
+   16 paren: L_PAREN add R_PAREN .
+   18      | add R_PAREN .
 
-    MINUS  shift, and go to state 14
-
-    $default  reduce using rule 3 (add)
+    PLUS      reduce using rule 16 (paren)
+    PLUS      [reduce using rule 18 (paren)]
+    MULT      reduce using rule 16 (paren)
+    MULT      [reduce using rule 18 (paren)]
+    MINUS     reduce using rule 16 (paren)
+    MINUS     [reduce using rule 18 (paren)]
+    DIV       reduce using rule 16 (paren)
+    DIV       [reduce using rule 18 (paren)]
+    R_PAREN   reduce using rule 16 (paren)
+    R_PAREN   [reduce using rule 18 (paren)]
+    $default  reduce using rule 16 (paren)
 
 
 State 19
 
-    5 sub: sub MINUS mult .
-    7 mult: mult . MULT div
+    4 add: add . PLUS sub
+    6    | add . PLUS
+   18 paren: add . R_PAREN
 
-    MULT  shift, and go to state 15
-
-    $default  reduce using rule 5 (sub)
+    PLUS     shift, and go to state 12
+    R_PAREN  shift, and go to state 13
 
 
 State 20
 
-    7 mult: mult MULT div .
-    9 div: div . DIV term
+    4 add: add PLUS sub .
+    5    | sub .
+    7 sub: sub . MINUS mult
+    9    | sub . MINUS
 
-    DIV  shift, and go to state 16
+    MINUS  shift, and go to state 15
 
-    $default  reduce using rule 7 (mult)
+    PLUS      reduce using rule 4 (add)
+    PLUS      [reduce using rule 5 (add)]
+    R_PAREN   reduce using rule 4 (add)
+    R_PAREN   [reduce using rule 5 (add)]
+    $default  reduce using rule 4 (add)
 
 
 State 21
 
-    9 div: div DIV term .
+    7 sub: sub MINUS mult .
+    8    | mult .
+   10 mult: mult . MULT div
+   12     | mult . MULT
 
-    $default  reduce using rule 9 (div)
+    MULT  shift, and go to state 16
+
+    PLUS      reduce using rule 7 (sub)
+    PLUS      [reduce using rule 8 (sub)]
+    MINUS     reduce using rule 7 (sub)
+    MINUS     [reduce using rule 8 (sub)]
+    R_PAREN   reduce using rule 7 (sub)
+    R_PAREN   [reduce using rule 8 (sub)]
+    $default  reduce using rule 7 (sub)
+
+
+State 22
+
+   10 mult: mult MULT div .
+   11     | div .
+   13 div: div . DIV term
+   15    | div . DIV
+
+    DIV  shift, and go to state 17
+
+    PLUS      reduce using rule 10 (mult)
+    PLUS      [reduce using rule 11 (mult)]
+    MULT      reduce using rule 10 (mult)
+    MULT      [reduce using rule 11 (mult)]
+    MINUS     reduce using rule 10 (mult)
+    MINUS     [reduce using rule 11 (mult)]
+    R_PAREN   reduce using rule 10 (mult)
+    R_PAREN   [reduce using rule 11 (mult)]
+    $default  reduce using rule 10 (mult)
+
+
+State 23
+
+   13 div: div DIV term .
+
+    $default  reduce using rule 13 (div)

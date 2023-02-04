@@ -26,5 +26,7 @@ int_const	{digit}+
 [ \t]*		{}
 [\n]		{ yylineno++;	}
 
-.		{ std::cerr << "SCANNER "; yyerror(""); exit(1);	}
+<<EOF>> { exit(1); }
+
+.		{ std::cerr << "SCANNER "; yyerror("Unrecognized character"); exit(1);	}
 
