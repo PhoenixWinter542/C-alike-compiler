@@ -39,7 +39,6 @@ int equalCount = 0;
 
 input:		/* empty */
 		| add EQUAL	{ cout << "Result: " << $1 << "\nIntegers: " << intCount << "\nOperators: " << opCount << "\nParentheses: " << parenCount  << "\nEqual Signs: " << ++equalCount << endl; YYACCEPT; }
-    | MINUS add EQUAL	{ cout << "Result: " << 0 - $2 << "\nIntegers: " << intCount << "\nOperators: " << opCount << "\nParentheses: " << parenCount  << "\nEqual Signs: " << ++equalCount << endl; YYACCEPT; }
 		| add { yyerror("EXPECTED '='"); }
     ;
 
