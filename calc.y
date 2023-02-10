@@ -16,58 +16,123 @@ int equalCount = 0;
   string*	op_val;
 }
 
-%start	input 
+%start	start
 
-%token	<int_val>	NUMBER
-
-%type	<int_val>	add
-%type	<int_val>	sub
-%type	<int_val>	mult
-%type	<int_val>	div
-%type <int_val> paren
-%type <int_val> term
-
-%left	PLUS
-%left	MULT
-%left MINUS
-%left DIV
-%left L_PAREN
-%left R_PAREN
-%left EQUAL
+%left	DIGIT
+%left	SPACE
+%left	VARIABLE
+%left	INTEGER
+%left	LESS
+%left	GREATER
+%left	LTE
+%left	GTE
+%left	EQUAL
+%left	NOT
+%left	ADD
+%left	SUBTRACT
+%left	MULTIPLY
+%left	DIVIDE
+%left	WHILE
+%left	L_PAREN
+%left	R_PAREN
+%left	L_BRACK
+%left	R_BRACK
+%left	L_BRACE
+%left	R_BRACE
+%left	IF
+%left	ELSE
+%left	READ
+%left	WRITE
+%left	END
+%left	SEPARATOR
+%left	RETURN
+%left	NEWLINE
+%left COMPEQUAL
+%left DO
 
 %%
 
-input:		/* empty */
-		| add EQUAL	{ cout << "Result: " << $1 << "\nIntegers: " << intCount << "\nOperators: " << opCount << "\nParentheses: " << parenCount  << "\nEqual Signs: " << ++equalCount << endl; YYACCEPT; }
-		| add { yyerror("EXPECTED '='"); }
+start:    function
     ;
 
-add:    add PLUS sub	{ $$ = $1 + $3; cout << "PLUS" << endl; ++opCount; }
-    | sub
-    | add PLUS { yyerror("EXPECTED number"); }
-		;
-
-sub:    sub MINUS mult { $$ = $1 - $3; cout << "MINUS" << endl; ++opCount; }
-    | mult
-    | sub MINUS { yyerror("EXPECTED number"); }
+function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
     ;
 
-mult:   mult MULT div { $$ = $1 * $3; cout << "MULT" << endl; ++opCount; }
-    | div
-    | mult MULT { yyerror("EXPECTED number"); }
+type:     INTEGER
     ;
 
-div:    div DIV term { $$ = $1 / $3; cout << "DIV" << endl; ++opCount; }
-    | paren
-    | div DIV { yyerror("EXPECTED number"); }
+varcnst:  VARIABLE
+    | DIGIT
     ;
 
-paren:  L_PAREN add R_PAREN { $$ = $2; cout << "PAREN " << endl; ++ parenCount; }
-    | term
-    | add R_PAREN { yyerror("EXPECTED '('"); }
+array:    L_BRACK DIGIT R_BRACK
     ;
 
-term:   NUMBER { $$ = $1; ++intCount; }
+assign:   VARIABLE SPACE EQUAL SPACE varcnst SPACE END
+    ;
+
+arith:    ADD
+    | SUBTRACT
+    | MULTIPLY
+    | DIVIDE
+    ;
+
+arnie:    SPACE
+    | SEPARATOR
+    | END
+    | R_BRACE
+    | R_BRACK
+    | R_PAREN
+    ;
+
+arg:      /* empty */
+    | L_BRACK varcnst multarg R_BRACK
+    ;
+
+multarg:  /* empty */
+    | SEPARATOR varcnst multarg
+    ;
+
+COMPARE:  L_BRACK varcnst relate varcnst R_BRACK
+    ;
+
+declare:  /* empty */
+    | type SPACE varcnst multdec
+    ;
+
+multdec:  /* empty */
+    | SEPARATOR varcnst multdec
+    ;
+
+loop:     WHILE code
+    | DO code WHILE
+    ;
+
+case:     IF code elcase
+    ;
+
+elcase:   /* empty */
+    | ELSE code
+    ;
+
+comment:  
+    ;
+
+relate:   LESS
+    | GREATER
+    | LTE
+    | GTE
+    | COMPEQUAL
+    ;
+
+balbrace: /* todo */
+    ;
+
+
+code:     L_BRACE middle R_BRACE;
+    ;
+
+middle:   /* todo */
     ;
 
 %%
