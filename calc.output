@@ -1,365 +1,371 @@
-State 18 conflicts: 5 reduce/reduce
-State 20 conflicts: 2 reduce/reduce
-State 21 conflicts: 3 reduce/reduce
-State 22 conflicts: 4 reduce/reduce
+Nonterminals useless in grammar
+
+   array
+   assign
+   arith
+   arnie
+   arg
+   multarg
+   COMPARE
+   loop
+   case
+   elcase
+   comment
+   relate
+   balbrace
+
+
+Terminals unused in grammar
+
+   LESS
+   GREATER
+   LTE
+   GTE
+   EQUAL
+   NOT
+   ADD
+   SUBTRACT
+   MULTIPLY
+   DIVIDE
+   WHILE
+   L_BRACK
+   R_BRACK
+   IF
+   ELSE
+   READ
+   WRITE
+   END
+   RETURN
+   NEWLINE
+   COMPEQUAL
+   DO
+
+
+Rules useless in grammar
+
+   12 array: L_BRACK DIGIT R_BRACK
+
+   13 assign: VARIABLE SPACE EQUAL SPACE varcnst SPACE END
+
+   14 arith: ADD
+   15      | SUBTRACT
+   16      | MULTIPLY
+   17      | DIVIDE
+
+   18 arnie: SPACE
+   19      | SEPARATOR
+   20      | END
+   21      | R_BRACE
+   22      | R_BRACK
+   23      | R_PAREN
+
+   24 arg: %empty
+   25    | L_BRACK varcnst multarg R_BRACK
+
+   26 multarg: %empty
+   27        | SEPARATOR varcnst multarg
+
+   28 COMPARE: L_BRACK varcnst relate varcnst R_BRACK
+
+   29 loop: WHILE code
+   30     | DO code WHILE
+
+   31 case: IF code elcase
+
+   32 elcase: %empty
+   33       | ELSE code
+
+   34 comment: %empty
+
+   35 relate: LESS
+   36       | GREATER
+   37       | LTE
+   38       | GTE
+   39       | COMPEQUAL
+
+   40 balbrace: %empty
 
 
 Grammar
 
-    0 $accept: input $end
+    0 $accept: start $end
 
-    1 input: %empty
-    2      | add EQUAL
-    3      | add
+    1 start: function
 
-    4 add: add PLUS sub
-    5    | sub
-    6    | add PLUS
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
 
-    7 sub: sub MINUS mult
-    8    | mult
-    9    | sub MINUS
+    3 type: INTEGER
 
-   10 mult: mult MULT div
-   11     | div
-   12     | mult MULT
+    4 varcnst: VARIABLE
+    5        | DIGIT
 
-   13 div: div DIV term
-   14    | paren
-   15    | div DIV
+    6 declare: %empty
+    7        | type SPACE varcnst multdec
 
-   16 paren: L_PAREN add R_PAREN
-   17      | term
-   18      | add R_PAREN
+    8 multdec: %empty
+    9        | SEPARATOR varcnst multdec
 
-   19 term: NUMBER
+   10 code: L_BRACE middle R_BRACE
+
+   11 middle: %empty
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-NUMBER (258) 19
-PLUS (259) 4 6
-MULT (260) 10 12
-MINUS (261) 7 9
-DIV (262) 13 15
-L_PAREN (263) 16
-R_PAREN (264) 16 18
-EQUAL (265) 2
+DIGIT (258) 5
+SPACE (259) 2 7
+VARIABLE (260) 2 4
+INTEGER (261) 3
+LESS (262)
+GREATER (263)
+LTE (264)
+GTE (265)
+EQUAL (266)
+NOT (267)
+ADD (268)
+SUBTRACT (269)
+MULTIPLY (270)
+DIVIDE (271)
+WHILE (272)
+L_PAREN (273) 2
+R_PAREN (274) 2
+L_BRACK (275)
+R_BRACK (276)
+L_BRACE (277) 10
+R_BRACE (278) 10
+IF (279)
+ELSE (280)
+READ (281)
+WRITE (282)
+END (283)
+SEPARATOR (284) 9
+RETURN (285)
+NEWLINE (286)
+COMPEQUAL (287)
+DO (288)
 
 
 Nonterminals, with rules where they appear
 
-$accept (11)
+$accept (34)
     on left: 0
-input (12)
-    on left: 1 2 3, on right: 0
-add (13)
-    on left: 4 5 6, on right: 2 3 4 6 16 18
-sub (14)
-    on left: 7 8 9, on right: 4 5 7 9
-mult (15)
-    on left: 10 11 12, on right: 7 8 10 12
-div (16)
-    on left: 13 14 15, on right: 10 11 13 15
-paren (17)
-    on left: 16 17 18, on right: 14
-term (18)
-    on left: 19, on right: 13 17
+start (35)
+    on left: 1, on right: 0
+function (36)
+    on left: 2, on right: 1
+type (37)
+    on left: 3, on right: 2 7
+varcnst (38)
+    on left: 4 5, on right: 7 9
+declare (39)
+    on left: 6 7, on right: 2
+multdec (40)
+    on left: 8 9, on right: 7 9
+code (41)
+    on left: 10, on right: 2
+middle (42)
+    on left: 11, on right: 10
 
 
 State 0
 
-    0 $accept: . input $end
+    0 $accept: . start $end
 
-    NUMBER   shift, and go to state 1
-    L_PAREN  shift, and go to state 2
+    INTEGER  shift, and go to state 1
 
-    $default  reduce using rule 1 (input)
-
-    input  go to state 3
-    add    go to state 4
-    sub    go to state 5
-    mult   go to state 6
-    div    go to state 7
-    paren  go to state 8
-    term   go to state 9
+    start     go to state 2
+    function  go to state 3
+    type      go to state 4
 
 
 State 1
 
-   19 term: NUMBER .
+    3 type: INTEGER .
 
-    $default  reduce using rule 19 (term)
+    $default  reduce using rule 3 (type)
 
 
 State 2
 
-   16 paren: L_PAREN . add R_PAREN
+    0 $accept: start . $end
 
-    NUMBER   shift, and go to state 1
-    L_PAREN  shift, and go to state 2
-
-    add    go to state 10
-    sub    go to state 5
-    mult   go to state 6
-    div    go to state 7
-    paren  go to state 8
-    term   go to state 9
+    $end  shift, and go to state 5
 
 
 State 3
 
-    0 $accept: input . $end
+    1 start: function .
 
-    $end  shift, and go to state 11
+    $default  reduce using rule 1 (start)
 
 
 State 4
 
-    2 input: add . EQUAL
-    3      | add .
-    4 add: add . PLUS sub
-    6    | add . PLUS
-   18 paren: add . R_PAREN
+    2 function: type . SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
 
-    PLUS     shift, and go to state 12
-    R_PAREN  shift, and go to state 13
-    EQUAL    shift, and go to state 14
-
-    $default  reduce using rule 3 (input)
+    SPACE  shift, and go to state 6
 
 
 State 5
 
-    5 add: sub .
-    7 sub: sub . MINUS mult
-    9    | sub . MINUS
-
-    MINUS  shift, and go to state 15
-
-    $default  reduce using rule 5 (add)
-
-
-State 6
-
-    8 sub: mult .
-   10 mult: mult . MULT div
-   12     | mult . MULT
-
-    MULT  shift, and go to state 16
-
-    $default  reduce using rule 8 (sub)
-
-
-State 7
-
-   11 mult: div .
-   13 div: div . DIV term
-   15    | div . DIV
-
-    DIV  shift, and go to state 17
-
-    $default  reduce using rule 11 (mult)
-
-
-State 8
-
-   14 div: paren .
-
-    $default  reduce using rule 14 (div)
-
-
-State 9
-
-   17 paren: term .
-
-    $default  reduce using rule 17 (paren)
-
-
-State 10
-
-    4 add: add . PLUS sub
-    6    | add . PLUS
-   16 paren: L_PAREN add . R_PAREN
-   18      | add . R_PAREN
-
-    PLUS     shift, and go to state 12
-    R_PAREN  shift, and go to state 18
-
-
-State 11
-
-    0 $accept: input $end .
+    0 $accept: start $end .
 
     $default  accept
 
 
+State 6
+
+    2 function: type SPACE . VARIABLE SPACE L_PAREN declare R_PAREN code
+
+    VARIABLE  shift, and go to state 7
+
+
+State 7
+
+    2 function: type SPACE VARIABLE . SPACE L_PAREN declare R_PAREN code
+
+    SPACE  shift, and go to state 8
+
+
+State 8
+
+    2 function: type SPACE VARIABLE SPACE . L_PAREN declare R_PAREN code
+
+    L_PAREN  shift, and go to state 9
+
+
+State 9
+
+    2 function: type SPACE VARIABLE SPACE L_PAREN . declare R_PAREN code
+
+    INTEGER  shift, and go to state 1
+
+    $default  reduce using rule 6 (declare)
+
+    type     go to state 10
+    declare  go to state 11
+
+
+State 10
+
+    7 declare: type . SPACE varcnst multdec
+
+    SPACE  shift, and go to state 12
+
+
+State 11
+
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare . R_PAREN code
+
+    R_PAREN  shift, and go to state 13
+
+
 State 12
 
-    4 add: add PLUS . sub
-    6    | add PLUS .
+    7 declare: type SPACE . varcnst multdec
 
-    NUMBER   shift, and go to state 1
-    L_PAREN  shift, and go to state 2
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 15
 
-    $default  reduce using rule 6 (add)
-
-    add    go to state 19
-    sub    go to state 20
-    mult   go to state 6
-    div    go to state 7
-    paren  go to state 8
-    term   go to state 9
+    varcnst  go to state 16
 
 
 State 13
 
-   18 paren: add R_PAREN .
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN . code
 
-    $default  reduce using rule 18 (paren)
+    L_BRACE  shift, and go to state 17
+
+    code  go to state 18
 
 
 State 14
 
-    2 input: add EQUAL .
+    5 varcnst: DIGIT .
 
-    $default  reduce using rule 2 (input)
+    $default  reduce using rule 5 (varcnst)
 
 
 State 15
 
-    7 sub: sub MINUS . mult
-    9    | sub MINUS .
+    4 varcnst: VARIABLE .
 
-    NUMBER   shift, and go to state 1
-    L_PAREN  shift, and go to state 2
-
-    $default  reduce using rule 9 (sub)
-
-    add    go to state 19
-    sub    go to state 5
-    mult   go to state 21
-    div    go to state 7
-    paren  go to state 8
-    term   go to state 9
+    $default  reduce using rule 4 (varcnst)
 
 
 State 16
 
-   10 mult: mult MULT . div
-   12     | mult MULT .
+    7 declare: type SPACE varcnst . multdec
 
-    NUMBER   shift, and go to state 1
-    L_PAREN  shift, and go to state 2
+    SEPARATOR  shift, and go to state 19
 
-    $default  reduce using rule 12 (mult)
+    $default  reduce using rule 8 (multdec)
 
-    add    go to state 19
-    sub    go to state 5
-    mult   go to state 6
-    div    go to state 22
-    paren  go to state 8
-    term   go to state 9
+    multdec  go to state 20
 
 
 State 17
 
-   13 div: div DIV . term
-   15    | div DIV .
+   10 code: L_BRACE . middle R_BRACE
 
-    NUMBER  shift, and go to state 1
+    $default  reduce using rule 11 (middle)
 
-    $default  reduce using rule 15 (div)
-
-    term  go to state 23
+    middle  go to state 21
 
 
 State 18
 
-   16 paren: L_PAREN add R_PAREN .
-   18      | add R_PAREN .
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code .
 
-    PLUS      reduce using rule 16 (paren)
-    PLUS      [reduce using rule 18 (paren)]
-    MULT      reduce using rule 16 (paren)
-    MULT      [reduce using rule 18 (paren)]
-    MINUS     reduce using rule 16 (paren)
-    MINUS     [reduce using rule 18 (paren)]
-    DIV       reduce using rule 16 (paren)
-    DIV       [reduce using rule 18 (paren)]
-    R_PAREN   reduce using rule 16 (paren)
-    R_PAREN   [reduce using rule 18 (paren)]
-    $default  reduce using rule 16 (paren)
+    $default  reduce using rule 2 (function)
 
 
 State 19
 
-    4 add: add . PLUS sub
-    6    | add . PLUS
-   18 paren: add . R_PAREN
+    9 multdec: SEPARATOR . varcnst multdec
 
-    PLUS     shift, and go to state 12
-    R_PAREN  shift, and go to state 13
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 15
+
+    varcnst  go to state 22
 
 
 State 20
 
-    4 add: add PLUS sub .
-    5    | sub .
-    7 sub: sub . MINUS mult
-    9    | sub . MINUS
+    7 declare: type SPACE varcnst multdec .
 
-    MINUS  shift, and go to state 15
-
-    PLUS      reduce using rule 4 (add)
-    PLUS      [reduce using rule 5 (add)]
-    R_PAREN   reduce using rule 4 (add)
-    R_PAREN   [reduce using rule 5 (add)]
-    $default  reduce using rule 4 (add)
+    $default  reduce using rule 7 (declare)
 
 
 State 21
 
-    7 sub: sub MINUS mult .
-    8    | mult .
-   10 mult: mult . MULT div
-   12     | mult . MULT
+   10 code: L_BRACE middle . R_BRACE
 
-    MULT  shift, and go to state 16
-
-    PLUS      reduce using rule 7 (sub)
-    PLUS      [reduce using rule 8 (sub)]
-    MINUS     reduce using rule 7 (sub)
-    MINUS     [reduce using rule 8 (sub)]
-    R_PAREN   reduce using rule 7 (sub)
-    R_PAREN   [reduce using rule 8 (sub)]
-    $default  reduce using rule 7 (sub)
+    R_BRACE  shift, and go to state 23
 
 
 State 22
 
-   10 mult: mult MULT div .
-   11     | div .
-   13 div: div . DIV term
-   15    | div . DIV
+    9 multdec: SEPARATOR varcnst . multdec
 
-    DIV  shift, and go to state 17
+    SEPARATOR  shift, and go to state 19
 
-    PLUS      reduce using rule 10 (mult)
-    PLUS      [reduce using rule 11 (mult)]
-    MULT      reduce using rule 10 (mult)
-    MULT      [reduce using rule 11 (mult)]
-    MINUS     reduce using rule 10 (mult)
-    MINUS     [reduce using rule 11 (mult)]
-    R_PAREN   reduce using rule 10 (mult)
-    R_PAREN   [reduce using rule 11 (mult)]
-    $default  reduce using rule 10 (mult)
+    $default  reduce using rule 8 (multdec)
+
+    multdec  go to state 24
 
 
 State 23
 
-   13 div: div DIV term .
+   10 code: L_BRACE middle R_BRACE .
 
-    $default  reduce using rule 13 (div)
+    $default  reduce using rule 10 (code)
+
+
+State 24
+
+    9 multdec: SEPARATOR varcnst multdec .
+
+    $default  reduce using rule 9 (multdec)
