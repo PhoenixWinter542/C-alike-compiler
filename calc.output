@@ -1,0 +1,371 @@
+Nonterminals useless in grammar
+
+   array
+   assign
+   arith
+   arnie
+   arg
+   multarg
+   COMPARE
+   loop
+   case
+   elcase
+   comment
+   relate
+   balbrace
+
+
+Terminals unused in grammar
+
+   LESS
+   GREATER
+   LTE
+   GTE
+   EQUAL
+   NOT
+   ADD
+   SUBTRACT
+   MULTIPLY
+   DIVIDE
+   WHILE
+   L_BRACK
+   R_BRACK
+   IF
+   ELSE
+   READ
+   WRITE
+   END
+   RETURN
+   NEWLINE
+   COMPEQUAL
+   DO
+
+
+Rules useless in grammar
+
+   12 array: L_BRACK DIGIT R_BRACK
+
+   13 assign: VARIABLE SPACE EQUAL SPACE varcnst SPACE END
+
+   14 arith: ADD
+   15      | SUBTRACT
+   16      | MULTIPLY
+   17      | DIVIDE
+
+   18 arnie: SPACE
+   19      | SEPARATOR
+   20      | END
+   21      | R_BRACE
+   22      | R_BRACK
+   23      | R_PAREN
+
+   24 arg: %empty
+   25    | L_BRACK varcnst multarg R_BRACK
+
+   26 multarg: %empty
+   27        | SEPARATOR varcnst multarg
+
+   28 COMPARE: L_BRACK varcnst relate varcnst R_BRACK
+
+   29 loop: WHILE code
+   30     | DO code WHILE
+
+   31 case: IF code elcase
+
+   32 elcase: %empty
+   33       | ELSE code
+
+   34 comment: %empty
+
+   35 relate: LESS
+   36       | GREATER
+   37       | LTE
+   38       | GTE
+   39       | COMPEQUAL
+
+   40 balbrace: %empty
+
+
+Grammar
+
+    0 $accept: start $end
+
+    1 start: function
+
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
+
+    3 type: INTEGER
+
+    4 varcnst: VARIABLE
+    5        | DIGIT
+
+    6 declare: %empty
+    7        | type SPACE varcnst multdec
+
+    8 multdec: %empty
+    9        | SEPARATOR varcnst multdec
+
+   10 code: L_BRACE middle R_BRACE
+
+   11 middle: %empty
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+DIGIT (258) 5
+SPACE (259) 2 7
+VARIABLE (260) 2 4
+INTEGER (261) 3
+LESS (262)
+GREATER (263)
+LTE (264)
+GTE (265)
+EQUAL (266)
+NOT (267)
+ADD (268)
+SUBTRACT (269)
+MULTIPLY (270)
+DIVIDE (271)
+WHILE (272)
+L_PAREN (273) 2
+R_PAREN (274) 2
+L_BRACK (275)
+R_BRACK (276)
+L_BRACE (277) 10
+R_BRACE (278) 10
+IF (279)
+ELSE (280)
+READ (281)
+WRITE (282)
+END (283)
+SEPARATOR (284) 9
+RETURN (285)
+NEWLINE (286)
+COMPEQUAL (287)
+DO (288)
+
+
+Nonterminals, with rules where they appear
+
+$accept (34)
+    on left: 0
+start (35)
+    on left: 1, on right: 0
+function (36)
+    on left: 2, on right: 1
+type (37)
+    on left: 3, on right: 2 7
+varcnst (38)
+    on left: 4 5, on right: 7 9
+declare (39)
+    on left: 6 7, on right: 2
+multdec (40)
+    on left: 8 9, on right: 7 9
+code (41)
+    on left: 10, on right: 2
+middle (42)
+    on left: 11, on right: 10
+
+
+State 0
+
+    0 $accept: . start $end
+
+    INTEGER  shift, and go to state 1
+
+    start     go to state 2
+    function  go to state 3
+    type      go to state 4
+
+
+State 1
+
+    3 type: INTEGER .
+
+    $default  reduce using rule 3 (type)
+
+
+State 2
+
+    0 $accept: start . $end
+
+    $end  shift, and go to state 5
+
+
+State 3
+
+    1 start: function .
+
+    $default  reduce using rule 1 (start)
+
+
+State 4
+
+    2 function: type . SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
+
+    SPACE  shift, and go to state 6
+
+
+State 5
+
+    0 $accept: start $end .
+
+    $default  accept
+
+
+State 6
+
+    2 function: type SPACE . VARIABLE SPACE L_PAREN declare R_PAREN code
+
+    VARIABLE  shift, and go to state 7
+
+
+State 7
+
+    2 function: type SPACE VARIABLE . SPACE L_PAREN declare R_PAREN code
+
+    SPACE  shift, and go to state 8
+
+
+State 8
+
+    2 function: type SPACE VARIABLE SPACE . L_PAREN declare R_PAREN code
+
+    L_PAREN  shift, and go to state 9
+
+
+State 9
+
+    2 function: type SPACE VARIABLE SPACE L_PAREN . declare R_PAREN code
+
+    INTEGER  shift, and go to state 1
+
+    $default  reduce using rule 6 (declare)
+
+    type     go to state 10
+    declare  go to state 11
+
+
+State 10
+
+    7 declare: type . SPACE varcnst multdec
+
+    SPACE  shift, and go to state 12
+
+
+State 11
+
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare . R_PAREN code
+
+    R_PAREN  shift, and go to state 13
+
+
+State 12
+
+    7 declare: type SPACE . varcnst multdec
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 15
+
+    varcnst  go to state 16
+
+
+State 13
+
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN . code
+
+    L_BRACE  shift, and go to state 17
+
+    code  go to state 18
+
+
+State 14
+
+    5 varcnst: DIGIT .
+
+    $default  reduce using rule 5 (varcnst)
+
+
+State 15
+
+    4 varcnst: VARIABLE .
+
+    $default  reduce using rule 4 (varcnst)
+
+
+State 16
+
+    7 declare: type SPACE varcnst . multdec
+
+    SEPARATOR  shift, and go to state 19
+
+    $default  reduce using rule 8 (multdec)
+
+    multdec  go to state 20
+
+
+State 17
+
+   10 code: L_BRACE . middle R_BRACE
+
+    $default  reduce using rule 11 (middle)
+
+    middle  go to state 21
+
+
+State 18
+
+    2 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code .
+
+    $default  reduce using rule 2 (function)
+
+
+State 19
+
+    9 multdec: SEPARATOR . varcnst multdec
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 15
+
+    varcnst  go to state 22
+
+
+State 20
+
+    7 declare: type SPACE varcnst multdec .
+
+    $default  reduce using rule 7 (declare)
+
+
+State 21
+
+   10 code: L_BRACE middle . R_BRACE
+
+    R_BRACE  shift, and go to state 23
+
+
+State 22
+
+    9 multdec: SEPARATOR varcnst . multdec
+
+    SEPARATOR  shift, and go to state 19
+
+    $default  reduce using rule 8 (multdec)
+
+    multdec  go to state 24
+
+
+State 23
+
+   10 code: L_BRACE middle R_BRACE .
+
+    $default  reduce using rule 10 (code)
+
+
+State 24
+
+    9 multdec: SEPARATOR varcnst multdec .
+
+    $default  reduce using rule 9 (multdec)
