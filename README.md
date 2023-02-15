@@ -22,7 +22,8 @@ Compiler Name:  Compilotron <br>
 | int                                 | INTEGER                                                             |
 | [                                   | L_BRACK                                                             |
 | ]                                   | R_BRACK                                                             |
-| =                                   | EQUAL                                                               |
+| =                                   | ASSIGN                                                              | 
+| ==                                  | EQUAL                                                               |
 | <=                                  | LTE                                                                 |
 | >=                                  | GTE                                                                 |
 | !=                                  | NOTEQUAL                                                            |
