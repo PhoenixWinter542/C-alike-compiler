@@ -58,17 +58,37 @@ start:    function
 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
     ;
 
+call:   /* empty */   
+    |   VARIABLE arg
+    ;
+
 type:     INTEGER
     ;
 
 varcnst:  VARIABLE
     | DIGIT
+    | VARIABLE SPACE array
     ;
 
-array:    L_BRACK DIGIT R_BRACK
+math:   varcnst multmath
     ;
 
-assign:   VARIABLE SPACE EQUAL SPACE varcnst SPACE END
+multmath:   /* empty */
+    |   arith multmath varcnst
+    ;
+
+combo:  math
+    |   call
+    ;
+
+array:    L_BRACK combo R_BRACK
+    ;
+
+arraydec:  /* empty */
+    | type SPACE VARIABLE SPACE array END
+    ;
+
+assign:   VARIABLE SPACE EQUAL SPACE combo SPACE END
     ;
 
 arith:    ADD
@@ -86,14 +106,14 @@ arnie:    SPACE
     ;
 
 arg:      /* empty */
-    | L_BRACK varcnst multarg R_BRACK
+    | L_PAREN combo multarg R_PAREN
     ;
 
 multarg:  /* empty */
-    | SEPARATOR varcnst multarg
+    | SEPARATOR combo multarg
     ;
 
-COMPARE:  L_BRACK varcnst relate varcnst R_BRACK
+compare:  L_PAREN combo relate combo R_PAREN
     ;
 
 declare:  /* empty */
@@ -104,11 +124,11 @@ multdec:  /* empty */
     | SEPARATOR varcnst multdec
     ;
 
-loop:     WHILE code
-    | DO code WHILE
+loop:     WHILE compare code
+    | DO code WHILE compare
     ;
 
-case:     IF code elcase
+case:     IF compare code elcase
     ;
 
 elcase:   /* empty */
@@ -125,14 +145,48 @@ relate:   LESS
     | COMPEQUAL
     ;
 
-balbrace: /* todo */
+balbrace: L_BRACE balMiddle R_BRACE
+    ;
+
+balparen: L_PAREN balMiddle R_PAREN
+    ;
+
+balbrack: L_BRACK balMiddle R_BRACK
+    ;
+
+balCode:     balbrace
+    | balparen
+    | balbrack
+    | arnie
+    ;
+
+balMiddle:   /* empty */
+    | balCode balMiddle
     ;
 
 
 code:     L_BRACE middle R_BRACE;
     ;
 
-middle:   /* todo */
+read:   /* empty */
+    READ VARIABLE
+    ;
+
+write:  /* empty */
+    WRITE VARIABLE
+    ;
+
+middle:   /* empty */
+    |   assign
+    |   declare
+    |   loop
+    |   case
+    |   comment
+    |   code
+    |   read
+    |   write
+    |   arraydec
+    |   RETURN combo END
     ;
 
 %%
