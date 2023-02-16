@@ -1,89 +1,54 @@
 Nonterminals useless in grammar
 
-   array
-   assign
-   arith
    arnie
-   arg
-   multarg
-   COMPARE
-   loop
-   case
-   elcase
-   comment
-   relate
    balbrace
+   balparen
+   balbrack
+   balCode
+   balMiddle
 
 
 Terminals unused in grammar
 
-   LESS
-   GREATER
-   LTE
-   GTE
-   EQUAL
    NOT
-   ADD
-   SUBTRACT
-   MULTIPLY
-   DIVIDE
-   WHILE
-   L_BRACK
-   R_BRACK
-   IF
-   ELSE
-   READ
-   WRITE
-   END
-   RETURN
    NEWLINE
-   COMPEQUAL
-   DO
 
 
 Rules useless in grammar
 
-   12 array: L_BRACK DIGIT R_BRACK
+   56 arnie: SPACE
+   57      | SEPARATOR
+   58      | END
+   59      | R_BRACE
+   60      | R_BRACK
+   61      | R_PAREN
 
-   13 assign: VARIABLE SPACE EQUAL SPACE varcnst SPACE END
+   62 balbrace: L_BRACE balMiddle R_BRACE
 
-   14 arith: ADD
-   15      | SUBTRACT
-   16      | MULTIPLY
-   17      | DIVIDE
+   63 balparen: L_PAREN balMiddle R_PAREN
 
-   18 arnie: SPACE
-   19      | SEPARATOR
-   20      | END
-   21      | R_BRACE
-   22      | R_BRACK
-   23      | R_PAREN
+   64 balbrack: L_BRACK balMiddle R_BRACK
 
-   24 arg: %empty
-   25    | L_BRACK varcnst multarg R_BRACK
+   65 balCode: balbrace
+   66        | balparen
+   67        | balbrack
+   68        | arnie
 
-   26 multarg: %empty
-   27        | SEPARATOR varcnst multarg
+   69 balMiddle: %empty
+   70          | balCode balMiddle
 
-   28 COMPARE: L_BRACK varcnst relate varcnst R_BRACK
 
-   29 loop: WHILE code
-   30     | DO code WHILE
+Rules useless in parser due to conflicts
 
-   31 case: IF code elcase
+   22 arg: %empty
 
-   32 elcase: %empty
-   33       | ELSE code
+   36 comment: %empty
 
-   34 comment: %empty
+   45 middle: %empty
 
-   35 relate: LESS
-   36       | GREATER
-   37       | LTE
-   38       | GTE
-   39       | COMPEQUAL
 
-   40 balbrace: %empty
+State 17 conflicts: 1 reduce/reduce
+State 47 conflicts: 10 reduce/reduce
 
 
 Grammar
@@ -94,57 +59,119 @@ Grammar
 
     2 function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
 
-    3 type: INTEGER
+    3 call: %empty
+    4     | VARIABLE arg
 
-    4 varcnst: VARIABLE
-    5        | DIGIT
+    5 type: INTEGER
 
-    6 declare: %empty
-    7        | type SPACE varcnst multdec
+    6 varcnst: VARIABLE
+    7        | DIGIT
+    8        | VARIABLE SPACE array
 
-    8 multdec: %empty
-    9        | SEPARATOR varcnst multdec
+    9 math: varcnst multmath
 
-   10 code: L_BRACE middle R_BRACE
+   10 multmath: %empty
+   11         | arith multmath varcnst
 
-   11 middle: %empty
+   12 combo: math
+   13      | call
+
+   14 array: L_BRACK combo R_BRACK
+
+   15 arraydec: %empty
+   16         | type SPACE VARIABLE SPACE array END
+
+   17 assign: VARIABLE SPACE EQUAL SPACE combo SPACE END
+
+   18 arith: ADD
+   19      | SUBTRACT
+   20      | MULTIPLY
+   21      | DIVIDE
+
+   22 arg: %empty
+   23    | L_PAREN combo multarg R_PAREN
+
+   24 multarg: %empty
+   25        | SEPARATOR combo multarg
+
+   26 compare: L_PAREN combo relate combo R_PAREN
+
+   27 declare: %empty
+   28        | type SPACE varcnst multdec
+
+   29 multdec: %empty
+   30        | SEPARATOR varcnst multdec
+
+   31 loop: WHILE compare code
+   32     | DO code WHILE compare
+
+   33 case: IF compare code elcase
+
+   34 elcase: %empty
+   35       | ELSE code
+
+   36 comment: %empty
+
+   37 relate: LESS
+   38       | GREATER
+   39       | LTE
+   40       | GTE
+   41       | COMPEQUAL
+
+   42 code: L_BRACE middle R_BRACE
+
+   43 read: READ VARIABLE
+
+   44 write: WRITE VARIABLE
+
+   45 middle: %empty
+   46       | assign
+   47       | declare
+   48       | loop
+   49       | case
+   50       | comment
+   51       | code
+   52       | read
+   53       | write
+   54       | arraydec
+   55       | RETURN combo END
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-DIGIT (258) 5
-SPACE (259) 2 7
-VARIABLE (260) 2 4
-INTEGER (261) 3
-LESS (262)
-GREATER (263)
-LTE (264)
-GTE (265)
-EQUAL (266)
+DIGIT (258) 7
+SPACE (259) 2 8 16 17 28
+VARIABLE (260) 2 4 6 8 16 17 43 44
+INTEGER (261) 5
+LESS (262) 37
+GREATER (263) 38
+LTE (264) 39
+GTE (265) 40
+EQUAL (266) 17
 NOT (267)
-ADD (268)
-SUBTRACT (269)
-MULTIPLY (270)
-DIVIDE (271)
-WHILE (272)
-L_PAREN (273) 2
-R_PAREN (274) 2
-L_BRACK (275)
-R_BRACK (276)
-L_BRACE (277) 10
-R_BRACE (278) 10
-IF (279)
-ELSE (280)
-READ (281)
-WRITE (282)
-END (283)
-SEPARATOR (284) 9
-RETURN (285)
+ADD (268) 18
+SUBTRACT (269) 19
+MULTIPLY (270) 20
+DIVIDE (271) 21
+WHILE (272) 31 32
+L_PAREN (273) 2 23 26
+R_PAREN (274) 2 23 26
+L_BRACK (275) 14
+R_BRACK (276) 14
+L_BRACE (277) 42
+R_BRACE (278) 42
+IF (279) 33
+ELSE (280) 35
+READ (281) 43
+WRITE (282) 44
+END (283) 16 17 55
+SEPARATOR (284) 25 30
+RETURN (285) 55
 NEWLINE (286)
-COMPEQUAL (287)
-DO (288)
+COMPEQUAL (287) 41
+DO (288) 32
 
 
 Nonterminals, with rules where they appear
@@ -155,18 +182,54 @@ start (35)
     on left: 1, on right: 0
 function (36)
     on left: 2, on right: 1
-type (37)
-    on left: 3, on right: 2 7
-varcnst (38)
-    on left: 4 5, on right: 7 9
-declare (39)
-    on left: 6 7, on right: 2
-multdec (40)
-    on left: 8 9, on right: 7 9
-code (41)
-    on left: 10, on right: 2
-middle (42)
-    on left: 11, on right: 10
+call (37)
+    on left: 3 4, on right: 13
+type (38)
+    on left: 5, on right: 2 16 28
+varcnst (39)
+    on left: 6 7 8, on right: 9 11 28 30
+math (40)
+    on left: 9, on right: 12
+multmath (41)
+    on left: 10 11, on right: 9 11
+combo (42)
+    on left: 12 13, on right: 14 17 23 25 26 55
+array (43)
+    on left: 14, on right: 8 16
+arraydec (44)
+    on left: 15 16, on right: 54
+assign (45)
+    on left: 17, on right: 46
+arith (46)
+    on left: 18 19 20 21, on right: 11
+arg (47)
+    on left: 22 23, on right: 4
+multarg (48)
+    on left: 24 25, on right: 23 25
+compare (49)
+    on left: 26, on right: 31 32 33
+declare (50)
+    on left: 27 28, on right: 2 47
+multdec (51)
+    on left: 29 30, on right: 28 30
+loop (52)
+    on left: 31 32, on right: 48
+case (53)
+    on left: 33, on right: 49
+elcase (54)
+    on left: 34 35, on right: 33
+comment (55)
+    on left: 36, on right: 50
+relate (56)
+    on left: 37 38 39 40 41, on right: 26
+code (57)
+    on left: 42, on right: 2 31 32 33 35 51
+read (58)
+    on left: 43, on right: 52
+write (59)
+    on left: 44, on right: 53
+middle (60)
+    on left: 45 46 47 48 49 50 51 52 53 54 55, on right: 42
 
 
 State 0
@@ -182,9 +245,9 @@ State 0
 
 State 1
 
-    3 type: INTEGER .
+    5 type: INTEGER .
 
-    $default  reduce using rule 3 (type)
+    $default  reduce using rule 5 (type)
 
 
 State 2
@@ -242,7 +305,7 @@ State 9
 
     INTEGER  shift, and go to state 1
 
-    $default  reduce using rule 6 (declare)
+    $default  reduce using rule 27 (declare)
 
     type     go to state 10
     declare  go to state 11
@@ -250,7 +313,7 @@ State 9
 
 State 10
 
-    7 declare: type . SPACE varcnst multdec
+   28 declare: type . SPACE varcnst multdec
 
     SPACE  shift, and go to state 12
 
@@ -264,7 +327,7 @@ State 11
 
 State 12
 
-    7 declare: type SPACE . varcnst multdec
+   28 declare: type SPACE . varcnst multdec
 
     DIGIT     shift, and go to state 14
     VARIABLE  shift, and go to state 15
@@ -283,36 +346,61 @@ State 13
 
 State 14
 
-    5 varcnst: DIGIT .
+    7 varcnst: DIGIT .
 
-    $default  reduce using rule 5 (varcnst)
+    $default  reduce using rule 7 (varcnst)
 
 
 State 15
 
-    4 varcnst: VARIABLE .
+    6 varcnst: VARIABLE .
+    8        | VARIABLE . SPACE array
 
-    $default  reduce using rule 4 (varcnst)
+    $default  reduce using rule 6 (varcnst)
 
 
 State 16
 
-    7 declare: type SPACE varcnst . multdec
+   28 declare: type SPACE varcnst . multdec
 
     SEPARATOR  shift, and go to state 19
 
-    $default  reduce using rule 8 (multdec)
+    $default  reduce using rule 29 (multdec)
 
     multdec  go to state 20
 
 
 State 17
 
-   10 code: L_BRACE . middle R_BRACE
+   42 code: L_BRACE . middle R_BRACE
 
-    $default  reduce using rule 11 (middle)
+    VARIABLE  shift, and go to state 21
+    INTEGER   shift, and go to state 1
+    WHILE     shift, and go to state 22
+    L_BRACE   shift, and go to state 17
+    IF        shift, and go to state 23
+    READ      shift, and go to state 24
+    WRITE     shift, and go to state 25
+    RETURN    shift, and go to state 26
+    DO        shift, and go to state 27
 
-    middle  go to state 21
+    R_BRACE   reduce using rule 15 (arraydec)
+    R_BRACE   [reduce using rule 27 (declare)]
+    R_BRACE   [reduce using rule 36 (comment)]
+    R_BRACE   [reduce using rule 45 (middle)]
+    $default  reduce using rule 15 (arraydec)
+
+    type      go to state 28
+    arraydec  go to state 29
+    assign    go to state 30
+    declare   go to state 31
+    loop      go to state 32
+    case      go to state 33
+    comment   go to state 34
+    code      go to state 35
+    read      go to state 36
+    write     go to state 37
+    middle    go to state 38
 
 
 State 18
@@ -324,48 +412,721 @@ State 18
 
 State 19
 
-    9 multdec: SEPARATOR . varcnst multdec
+   30 multdec: SEPARATOR . varcnst multdec
 
     DIGIT     shift, and go to state 14
     VARIABLE  shift, and go to state 15
 
-    varcnst  go to state 22
+    varcnst  go to state 40
 
 
 State 20
 
-    7 declare: type SPACE varcnst multdec .
+   28 declare: type SPACE varcnst multdec .
 
-    $default  reduce using rule 7 (declare)
+    $default  reduce using rule 28 (declare)
 
 
 State 21
 
-   10 code: L_BRACE middle . R_BRACE
+   17 assign: VARIABLE . SPACE EQUAL SPACE combo SPACE END
 
-    R_BRACE  shift, and go to state 23
+    SPACE  shift, and go to state 41
 
 
 State 22
 
-    9 multdec: SEPARATOR varcnst . multdec
+   31 loop: WHILE . compare code
 
-    SEPARATOR  shift, and go to state 19
+    L_PAREN  shift, and go to state 42
 
-    $default  reduce using rule 8 (multdec)
-
-    multdec  go to state 24
+    compare  go to state 43
 
 
 State 23
 
-   10 code: L_BRACE middle R_BRACE .
+   33 case: IF . compare code elcase
 
-    $default  reduce using rule 10 (code)
+    L_PAREN  shift, and go to state 42
+
+    compare  go to state 44
 
 
 State 24
 
-    9 multdec: SEPARATOR varcnst multdec .
+   43 read: READ . VARIABLE
 
-    $default  reduce using rule 9 (multdec)
+    VARIABLE  shift, and go to state 45
+
+
+State 25
+
+   44 write: WRITE . VARIABLE
+
+    VARIABLE  shift, and go to state 46
+
+
+State 26
+
+   55 middle: RETURN . combo END
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 47
+
+    $default  reduce using rule 3 (call)
+
+    call     go to state 48
+    varcnst  go to state 49
+    math     go to state 50
+    combo    go to state 51
+
+
+State 27
+
+   32 loop: DO . code WHILE compare
+
+    L_BRACE  shift, and go to state 17
+
+    code  go to state 52
+
+
+State 28
+
+   16 arraydec: type . SPACE VARIABLE SPACE array END
+   28 declare: type . SPACE varcnst multdec
+
+    SPACE  shift, and go to state 53
+
+
+State 29
+
+   54 middle: arraydec .
+
+    $default  reduce using rule 54 (middle)
+
+
+State 30
+
+   46 middle: assign .
+
+    $default  reduce using rule 46 (middle)
+
+
+State 31
+
+   47 middle: declare .
+
+    $default  reduce using rule 47 (middle)
+
+
+State 32
+
+   48 middle: loop .
+
+    $default  reduce using rule 48 (middle)
+
+
+State 33
+
+   49 middle: case .
+
+    $default  reduce using rule 49 (middle)
+
+
+State 34
+
+   50 middle: comment .
+
+    $default  reduce using rule 50 (middle)
+
+
+State 35
+
+   51 middle: code .
+
+    $default  reduce using rule 51 (middle)
+
+
+State 36
+
+   52 middle: read .
+
+    $default  reduce using rule 52 (middle)
+
+
+State 37
+
+   53 middle: write .
+
+    $default  reduce using rule 53 (middle)
+
+
+State 38
+
+   42 code: L_BRACE middle . R_BRACE
+
+    R_BRACE  shift, and go to state 54
+
+
+State 39
+
+   14 array: L_BRACK . combo R_BRACK
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 47
+
+    $default  reduce using rule 3 (call)
+
+    call     go to state 48
+    varcnst  go to state 49
+    math     go to state 50
+    combo    go to state 55
+
+
+State 40
+
+   30 multdec: SEPARATOR varcnst . multdec
+
+    SEPARATOR  shift, and go to state 19
+
+    $default  reduce using rule 29 (multdec)
+
+    multdec  go to state 56
+
+
+State 41
+
+   17 assign: VARIABLE SPACE . EQUAL SPACE combo SPACE END
+
+    EQUAL  shift, and go to state 57
+
+
+State 42
+
+   26 compare: L_PAREN . combo relate combo R_PAREN
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 47
+
+    $default  reduce using rule 3 (call)
+
+    call     go to state 48
+    varcnst  go to state 49
+    math     go to state 50
+    combo    go to state 58
+
+
+State 43
+
+   31 loop: WHILE compare . code
+
+    L_BRACE  shift, and go to state 17
+
+    code  go to state 59
+
+
+State 44
+
+   33 case: IF compare . code elcase
+
+    L_BRACE  shift, and go to state 17
+
+    code  go to state 60
+
+
+State 45
+
+   43 read: READ VARIABLE .
+
+    $default  reduce using rule 43 (read)
+
+
+State 46
+
+   44 write: WRITE VARIABLE .
+
+    $default  reduce using rule 44 (write)
+
+
+State 47
+
+    4 call: VARIABLE . arg
+    6 varcnst: VARIABLE .
+    8        | VARIABLE . SPACE array
+
+    L_PAREN  shift, and go to state 61
+
+    SPACE      reduce using rule 6 (varcnst)
+    SPACE      [reduce using rule 22 (arg)]
+    LESS       reduce using rule 6 (varcnst)
+    LESS       [reduce using rule 22 (arg)]
+    GREATER    reduce using rule 6 (varcnst)
+    GREATER    [reduce using rule 22 (arg)]
+    LTE        reduce using rule 6 (varcnst)
+    LTE        [reduce using rule 22 (arg)]
+    GTE        reduce using rule 6 (varcnst)
+    GTE        [reduce using rule 22 (arg)]
+    R_PAREN    reduce using rule 6 (varcnst)
+    R_PAREN    [reduce using rule 22 (arg)]
+    R_BRACK    reduce using rule 6 (varcnst)
+    R_BRACK    [reduce using rule 22 (arg)]
+    END        reduce using rule 6 (varcnst)
+    END        [reduce using rule 22 (arg)]
+    SEPARATOR  reduce using rule 6 (varcnst)
+    SEPARATOR  [reduce using rule 22 (arg)]
+    COMPEQUAL  reduce using rule 6 (varcnst)
+    COMPEQUAL  [reduce using rule 22 (arg)]
+    $default   reduce using rule 6 (varcnst)
+
+    arg  go to state 62
+
+
+State 48
+
+   13 combo: call .
+
+    $default  reduce using rule 13 (combo)
+
+
+State 49
+
+    9 math: varcnst . multmath
+
+    ADD       shift, and go to state 63
+    SUBTRACT  shift, and go to state 64
+    MULTIPLY  shift, and go to state 65
+    DIVIDE    shift, and go to state 66
+
+    $default  reduce using rule 10 (multmath)
+
+    multmath  go to state 67
+    arith     go to state 68
+
+
+State 50
+
+   12 combo: math .
+
+    $default  reduce using rule 12 (combo)
+
+
+State 51
+
+   55 middle: RETURN combo . END
+
+    END  shift, and go to state 69
+
+
+State 52
+
+   32 loop: DO code . WHILE compare
+
+    WHILE  shift, and go to state 70
+
+
+State 53
+
+   16 arraydec: type SPACE . VARIABLE SPACE array END
+   28 declare: type SPACE . varcnst multdec
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 71
+
+    varcnst  go to state 16
+
+
+State 54
+
+   42 code: L_BRACE middle R_BRACE .
+
+    $default  reduce using rule 42 (code)
+
+
+State 55
+
+   14 array: L_BRACK combo . R_BRACK
+
+    R_BRACK  shift, and go to state 72
+
+
+State 56
+
+   30 multdec: SEPARATOR varcnst multdec .
+
+    $default  reduce using rule 30 (multdec)
+
+
+State 57
+
+   17 assign: VARIABLE SPACE EQUAL . SPACE combo SPACE END
+
+    SPACE  shift, and go to state 73
+
+
+State 58
+
+   26 compare: L_PAREN combo . relate combo R_PAREN
+
+    LESS       shift, and go to state 74
+    GREATER    shift, and go to state 75
+    LTE        shift, and go to state 76
+    GTE        shift, and go to state 77
+    COMPEQUAL  shift, and go to state 78
+
+    relate  go to state 79
+
+
+State 59
+
+   31 loop: WHILE compare code .
+
+    $default  reduce using rule 31 (loop)
+
+
+State 60
+
+   33 case: IF compare code . elcase
+
+    ELSE  shift, and go to state 80
+
+    $default  reduce using rule 34 (elcase)
+
+    elcase  go to state 81
+
+
+State 61
+
+   23 arg: L_PAREN . combo multarg R_PAREN
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 47
+
+    $default  reduce using rule 3 (call)
+
+    call     go to state 48
+    varcnst  go to state 49
+    math     go to state 50
+    combo    go to state 82
+
+
+State 62
+
+    4 call: VARIABLE arg .
+
+    $default  reduce using rule 4 (call)
+
+
+State 63
+
+   18 arith: ADD .
+
+    $default  reduce using rule 18 (arith)
+
+
+State 64
+
+   19 arith: SUBTRACT .
+
+    $default  reduce using rule 19 (arith)
+
+
+State 65
+
+   20 arith: MULTIPLY .
+
+    $default  reduce using rule 20 (arith)
+
+
+State 66
+
+   21 arith: DIVIDE .
+
+    $default  reduce using rule 21 (arith)
+
+
+State 67
+
+    9 math: varcnst multmath .
+
+    $default  reduce using rule 9 (math)
+
+
+State 68
+
+   11 multmath: arith . multmath varcnst
+
+    ADD       shift, and go to state 63
+    SUBTRACT  shift, and go to state 64
+    MULTIPLY  shift, and go to state 65
+    DIVIDE    shift, and go to state 66
+
+    $default  reduce using rule 10 (multmath)
+
+    multmath  go to state 83
+    arith     go to state 68
+
+
+State 69
+
+   55 middle: RETURN combo END .
+
+    $default  reduce using rule 55 (middle)
+
+
+State 70
+
+   32 loop: DO code WHILE . compare
+
+    L_PAREN  shift, and go to state 42
+
+    compare  go to state 84
+
+
+State 71
+
+    6 varcnst: VARIABLE .
+    8        | VARIABLE . SPACE array
+   16 arraydec: type SPACE VARIABLE . SPACE array END
+
+    SPACE  shift, and go to state 85
+
+    $default  reduce using rule 6 (varcnst)
+
+
+State 72
+
+   14 array: L_BRACK combo R_BRACK .
+
+    $default  reduce using rule 14 (array)
+
+
+State 73
+
+   17 assign: VARIABLE SPACE EQUAL SPACE . combo SPACE END
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 47
+
+    $default  reduce using rule 3 (call)
+
+    call     go to state 48
+    varcnst  go to state 49
+    math     go to state 50
+    combo    go to state 86
+
+
+State 74
+
+   37 relate: LESS .
+
+    $default  reduce using rule 37 (relate)
+
+
+State 75
+
+   38 relate: GREATER .
+
+    $default  reduce using rule 38 (relate)
+
+
+State 76
+
+   39 relate: LTE .
+
+    $default  reduce using rule 39 (relate)
+
+
+State 77
+
+   40 relate: GTE .
+
+    $default  reduce using rule 40 (relate)
+
+
+State 78
+
+   41 relate: COMPEQUAL .
+
+    $default  reduce using rule 41 (relate)
+
+
+State 79
+
+   26 compare: L_PAREN combo relate . combo R_PAREN
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 47
+
+    $default  reduce using rule 3 (call)
+
+    call     go to state 48
+    varcnst  go to state 49
+    math     go to state 50
+    combo    go to state 87
+
+
+State 80
+
+   35 elcase: ELSE . code
+
+    L_BRACE  shift, and go to state 17
+
+    code  go to state 88
+
+
+State 81
+
+   33 case: IF compare code elcase .
+
+    $default  reduce using rule 33 (case)
+
+
+State 82
+
+   23 arg: L_PAREN combo . multarg R_PAREN
+
+    SEPARATOR  shift, and go to state 89
+
+    $default  reduce using rule 24 (multarg)
+
+    multarg  go to state 90
+
+
+State 83
+
+   11 multmath: arith multmath . varcnst
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 15
+
+    varcnst  go to state 91
+
+
+State 84
+
+   32 loop: DO code WHILE compare .
+
+    $default  reduce using rule 32 (loop)
+
+
+State 85
+
+    8 varcnst: VARIABLE SPACE . array
+   16 arraydec: type SPACE VARIABLE SPACE . array END
+
+    L_BRACK  shift, and go to state 39
+
+    array  go to state 92
+
+
+State 86
+
+   17 assign: VARIABLE SPACE EQUAL SPACE combo . SPACE END
+
+    SPACE  shift, and go to state 93
+
+
+State 87
+
+   26 compare: L_PAREN combo relate combo . R_PAREN
+
+    R_PAREN  shift, and go to state 94
+
+
+State 88
+
+   35 elcase: ELSE code .
+
+    $default  reduce using rule 35 (elcase)
+
+
+State 89
+
+   25 multarg: SEPARATOR . combo multarg
+
+    DIGIT     shift, and go to state 14
+    VARIABLE  shift, and go to state 47
+
+    $default  reduce using rule 3 (call)
+
+    call     go to state 48
+    varcnst  go to state 49
+    math     go to state 50
+    combo    go to state 95
+
+
+State 90
+
+   23 arg: L_PAREN combo multarg . R_PAREN
+
+    R_PAREN  shift, and go to state 96
+
+
+State 91
+
+   11 multmath: arith multmath varcnst .
+
+    $default  reduce using rule 11 (multmath)
+
+
+State 92
+
+    8 varcnst: VARIABLE SPACE array .
+   16 arraydec: type SPACE VARIABLE SPACE array . END
+
+    END  shift, and go to state 97
+
+    $default  reduce using rule 8 (varcnst)
+
+
+State 93
+
+   17 assign: VARIABLE SPACE EQUAL SPACE combo SPACE . END
+
+    END  shift, and go to state 98
+
+
+State 94
+
+   26 compare: L_PAREN combo relate combo R_PAREN .
+
+    $default  reduce using rule 26 (compare)
+
+
+State 95
+
+   25 multarg: SEPARATOR combo . multarg
+
+    SEPARATOR  shift, and go to state 89
+
+    $default  reduce using rule 24 (multarg)
+
+    multarg  go to state 99
+
+
+State 96
+
+   23 arg: L_PAREN combo multarg R_PAREN .
+
+    $default  reduce using rule 23 (arg)
+
+
+State 97
+
+   16 arraydec: type SPACE VARIABLE SPACE array END .
+
+    $default  reduce using rule 16 (arraydec)
+
+
+State 98
+
+   17 assign: VARIABLE SPACE EQUAL SPACE combo SPACE END .
+
+    $default  reduce using rule 17 (assign)
+
+
+State 99
+
+   25 multarg: SEPARATOR combo multarg .
+
+    $default  reduce using rule 25 (multarg)
