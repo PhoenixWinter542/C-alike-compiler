@@ -64,17 +64,12 @@ int equalCount = 0;
 /* Types */
 %left	INTEGER
 
-/* Whitespace */
-%left	SPACE
-%left   OPTSPACE
-
-
 %%
 
 start:    function
     ;
 
-function: type SPACE VARIABLE OPTSPACE L_PAREN declare R_PAREN code
+function: type  VARIABLE  L_PAREN declare R_PAREN code
     ;
 
 call:   /* empty */   
@@ -86,7 +81,7 @@ type:     INTEGER
 
 varcnst:  VARIABLE
     | DIGIT
-    | VARIABLE SPACE array
+    | VARIABLE  array
     ;
 
 math:   varcnst multmath
@@ -104,10 +99,10 @@ array:    L_BRACK combo R_BRACK
     ;
 
 arraydec:  /* empty */
-    | type SPACE VARIABLE OPTSPACE array END
+    | type  VARIABLE  array END
     ;
 
-assign:   VARIABLE OPTSPACE EQUAL OPTSPACE combo OPTSPACE END
+assign:   VARIABLE  EQUAL  combo  END
     ;
 
 arith:    ADD
@@ -128,7 +123,7 @@ compare:  L_PAREN combo relate combo R_PAREN
     ;
 
 declare:  /* empty */
-    | type SPACE varcnst multdec
+    | type  varcnst multdec
     ;
 
 multdec:  /* empty */
@@ -144,9 +139,6 @@ case:     IF compare code elcase
 
 elcase:   /* empty */
     | ELSE code
-    ;
-
-comment:  
     ;
 
 relate:   LESS
@@ -192,7 +184,6 @@ middle:   /* empty */
     |   declare
     |   loop
     |   case
-    |   comment
     |   code
     |   read
     |   write

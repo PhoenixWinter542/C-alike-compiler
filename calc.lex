@@ -53,20 +53,23 @@ WRITE       write
 /* Types */
 INTEGER     "int"
 
-/* Whitespace */
-SPACE       [ \t\n]+
-OPTSPACE    [ \t\n]*
 
 /*-------------------------------------------------------------------------------*/
 
 /* Utility */
-ARNIE      {SPACE}|{SEPARATOR}|{END}|{R_BRACE}|{R_BRACK}|{R_PAREN}
-ALPHA     [a-zA-Z]
-ALNUM     [a-zA-Z0-9]+
-
+SPACE       [ \t\n]+
+ARNIE       {SPACE}|{SEPARATOR}|{END}|{R_BRACE}|{R_BRACK}|{R_PAREN}
+ALPHA       [a-zA-Z]
+ALNUM       [a-zA-Z0-9]+
 
 
 %%
+ /* ignore Comments */
+"//".*\n    { yylineno++;   }
+ /* ignore whitespace */
+[ \t]*		{}
+[\n]		{ yylineno++;	}
+
  /* Comparisons */
 {LESS}		{ yylval.op_val = new std::string(yytext); return LESS; }
 {GREATER}	{ yylval.op_val = new std::string(yytext); return GREATER; }
@@ -99,19 +102,13 @@ ALNUM     [a-zA-Z0-9]+
  /* Loops */
 {WHILE}	    { yylval.op_val = new std::string(yytext); return WHILE; }
 {DO}	    { yylval.op_val = new std::string(yytext); return DO; }
- /* Storage */
-{VARIABLE}	{ yylval.op_val = new std::string(yytext); return VARIABLE; }
-{READ}  	{ yylval.op_val = new std::string(yytext); return READ; }
-{WRITE}	    { yylval.op_val = new std::string(yytext); return WRITE; }
  /* Types */
 {INTEGER}	{ yylval.op_val = new std::string(yytext); return INTEGER; }
- /* Whitespace */
-{SPACE}	    { yylval.op_val = new std::string(yytext); return SPACE; }
-{OPTSPACE}	{ yylval.op_val = new std::string(yytext); return OPTSPACE; }
+ /* Storage */
+{READ}  	{ yylval.op_val = new std::string(yytext); return READ; }
+{WRITE}	    { yylval.op_val = new std::string(yytext); return WRITE; }
+{VARIABLE}	{ yylval.op_val = new std::string(yytext); return VARIABLE; }
 
- /* ignore whitespace */
-[ \t]*		{}
-[\n]		{ yylineno++;	}
 
 <<EOF>> { exit(1); }
 
