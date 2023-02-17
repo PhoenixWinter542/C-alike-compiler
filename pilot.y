@@ -126,34 +126,34 @@ multarg:  /* empty */                                           { printpos("mult
     | SEPARATOR combo multarg                                   { printpos("multarg -> SEPARATOR combo multarg", true); }
     ;
 
-compare:  L_PAREN combo relate combo R_PAREN                    { printpos("compare", true); }
+compare:  L_PAREN combo relate combo R_PAREN                    { printpos("compare -> L_PAREN combo relate combo R_PAREN", true); }
     ;
 
-declare:  /* empty */                                           { printpos("declare", true); }
-    | type  varcnst multdec                                     { printpos("declare", true); }
+declare:  /* empty */                                           { printpos("declare -> epsilon", true); }
+    | type varcnst multdec                                     { printpos("declare -> type varcnst multdec", true); }
     ;
 
-multdec:  /* empty */                                           { printpos("multdec", true); }
-    | SEPARATOR varcnst multdec                                 { printpos("multdec", true); }
+multdec:  /* empty */                                           { printpos("multdec -> epsilon", true); }
+    | SEPARATOR varcnst multdec                                 { printpos("multdec -> SEPARATOR varcnst multdec", true); }
     ;
 
-loop:     WHILE compare code                                    { printpos("loop", true); }
-    | DO code WHILE compare                                     { printpos("loop", true); }
+loop:     WHILE compare code                                    { printpos("loop -> WHILE compare code", true); }
+    | DO code WHILE compare                                     { printpos("loop -> DO code WHILE compare", true); }
     ;
 
-case:     IF compare code elcase                                { printpos("case", true); }
+case:     IF compare code elcase                                { printpos("case -> IF compare code elcase", true); }
     ;
 
-elcase:   /* empty */                                           { printpos("elcase", false); }
-    | ELSE code                                                 { printpos("elcase", true); }
+elcase:   /* empty */                                           { printpos("elcase -> epsilon", false); }
+    | ELSE code                                                 { printpos("elcase -> ELSE code", true); }
     ;
 
-relate:   LESS                                                  { printpos("relate", false); }
-    | GREATER                                                   { printpos("relate", false); }
-    | LTE                                                       { printpos("relate", false); }
-    | GTE                                                       { printpos("relate", false); }
-    | COMPEQUAL                                                 { printpos("relate", false); }
-    | NOT COMPEQUAL                                             { printpos("relate", false); }
+relate:   LESS                                                  { printpos("relate -> LESS", false); }
+    | GREATER                                                   { printpos("relate -> GREATER", false); }
+    | LTE                                                       { printpos("relate -> LTE", false); }
+    | GTE                                                       { printpos("relate -> GTE", false); }
+    | COMPEQUAL                                                 { printpos("relate -> COMPEQUAL", false); }
+    | NOT COMPEQUAL                                             { printpos("relate -> NOT COMPEQUAL", false); }
     ;
 /*
 balbrace: L_BRACE balCode R_BRACE
@@ -177,26 +177,26 @@ balMiddle:   /* empty
     ;
 */
 
-code:     L_BRACE middle R_BRACE                                { printpos("code", true); }
+code:     L_BRACE middle R_BRACE                                { printpos("code -> L_BRACE middle R_BRACE", true); }
     ;
 
-read:   /* empty */                                             { printpos("read", false); }
-    READ VARIABLE                                               { printpos("read", false); }
+middle:   /* empty */                                           { printpos("middle -> epsilon", true); }
+    |   assign END middle                                       { printpos("middle -> assign END middle", true); }
+    |   declare END middle                                      { printpos("middle -> declare END middle", true); }
+    |   loop END middle                                         { printpos("middle -> loop END middle", true); }
+    |   case middle                                             { printpos("middle -> read END middle", true); }
+    |   read END middle                                         { printpos("middle -> read END middle", true); }
+    |   write END middle                                        { printpos("middle -> write END middle", true); }
+    |   arraydec END middle                                     { printpos("middle -> arraydec END middle", true); }
+    |   RETURN combo END middle                                 { printpos("middle -> RETURN combo END middle", true); }
     ;
 
-write:  /* empty */                                             { printpos("write", false); }
-    WRITE VARIABLE                                              { printpos("write", false); }
+read:   /* empty */                                             { printpos("read -> epsilon", false); }
+    READ VARIABLE                                               { printpos("read -> READ VARIABLE", false); }
     ;
 
-middle:   /* empty */                                           { printpos("middle", true); }
-    |   assign END middle                                       { printpos("middle", true); }
-    |   declare END middle                                      { printpos("middle", true); }
-    |   loop END middle                                         { printpos("middle", true); }
-    |   case middle                                             { printpos("middle", true); }
-    |   read END middle                                         { printpos("middle", true); }
-    |   write END middle                                        { printpos("middle", true); }
-    |   arraydec END middle                                     { printpos("middle", true); }
-    |   RETURN combo END middle                                 { printpos("middle", true); }
+write:  /* empty */                                             { printpos("write -> epsilon", false); }
+    WRITE VARIABLE                                              { printpos("write -> WRITE VARIABLE", false); }
     ;
 
 %%
