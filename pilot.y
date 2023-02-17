@@ -5,7 +5,7 @@
 #include "heading.h"
 int yyerror(char *s);
 int yylex(void);
-void printpos(string cur, bool save);
+void printpos(string tokens, bool nonterm);
 int intCount = 0;
 int opCount = 0;
 int parenCount = 0;
@@ -68,62 +68,72 @@ string prev = "";
 
 %%
 
-start:    function                                              { printpos("start", true); }
+start:    function                                              { printpos("start -> function", true); }
     ;
 
-function: type  VARIABLE  L_PAREN declare R_PAREN code          { printpos("function", true); }
+function: type  VARIABLE  L_PAREN declare R_PAREN code          { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
     ;
 
-combo:  math                                                    { printpos("combo", true); }
-    | call                                                      { printpos("combo", true); }
+combo:  math                                                    { printpos("combo -> math", true); }
+    | call                                                      { printpos("combo -> call", true); }
     ;
 
-call:   VARIABLE L_PAREN combo multarg R_PAREN                  { printpos("call", true); }
+call:   VARIABLE L_PAREN combo multarg R_PAREN                  { printpos("call -> VARIABLE L_PAREN combo multarg R_PAREN", true); }
     ;
 
-type:   INTEGER                                                 { printpos("type", false); }
+type:   INTEGER                                                 { printpos("type -> INTEGER", false); }
     ;
 
-varcnst:  VARIABLE                                              { printpos("varcnst", false); }
-    | DIGIT                                                     { printpos("varcnst", false); }
-    | VARIABLE  array                                           { printpos("varcnst", true); }
+varcnst:  VARIABLE                                              { printpos("varcnst -> VARIABLE", false); }
+    | DIGIT                                                     { printpos("varcnst -> DIGIT", false); }
+    | VARIABLE  array                                           { printpos("varcnst -> VARIABLE array", true); }
     ;
 
-math:   varcnst multmath                                        { printpos("math", true); }
+math:   add                                                     { printpos("math -> add", true); }
     ;
 
-multmath:   /* empty */                                         { printpos("epsilon", false); }
-    |   arith multmath varcnst                                  { printpos("multmath", true); }
+add:    add ADD sub                                             { printpos("add -> add ADD sub", true); }
+    | sub                                                       { printpos("add -> sub", true); }
+	;
+
+sub:    sub SUBTRACT mult                                       { printpos("sub -> sub SUBTRACT mult", true); }
+    | mult                                                      { printpos("sub -> mult", true); }
     ;
 
-array:    L_BRACK combo R_BRACK                                 { printpos("array", true); }
+mult:   mult MULTIPLY div                                       { printpos("mult -> mult MULTIPLY div", true); }
+    | div                                                       { printpos("mult -> div", true); }
     ;
 
-arraydec:  /* empty */                                          { printpos("arraydec", false); }
-    | type VARIABLE array                                       { printpos("arraydec", true); }
+div:    div DIVIDE paren                                        { printpos("div -> div DIVIDE paren", true); }
+    | paren                                                     { printpos("div -> paren", true); }
     ;
 
-assign:   VARIABLE  EQUAL  combo                                { printpos("assign", true); }
+paren:  L_PAREN add R_PAREN                                     { printpos("paren -> L_PAREN add R_PAREN", true); }
+    | varcnst                                                   { printpos("paren -> varcnst", true); }
+
+
+array:    L_BRACK combo R_BRACK                                 { printpos("array -> L_BRACK combo R_BRACK", true); }
     ;
 
-arith:    ADD                                                   { printpos("arith", false); }
-    | SUBTRACT                                                  { printpos("arith", false); }
-    | MULTIPLY                                                  { printpos("arith", false); }
-    | DIVIDE                                                    { printpos("arith", false); }
+arraydec:  /* empty */                                          { printpos("arraydec -> epsilon", true); }
+    | type VARIABLE array                                       { printpos("arraydec -> type VARIABLE array", true); }
     ;
 
-multarg:  /* empty */                                           { printpos("multarg", false); }
-    | SEPARATOR combo multarg                                   { printpos("multarg", true); }
+assign:   VARIABLE  EQUAL  combo                                { printpos("assign ->  VARIABLE  EQUAL  combo", true); }
+    ;
+
+multarg:  /* empty */                                           { printpos("multarg -> epsilon", true); }
+    | SEPARATOR combo multarg                                   { printpos("multarg -> SEPARATOR combo multarg", true); }
     ;
 
 compare:  L_PAREN combo relate combo R_PAREN                    { printpos("compare", true); }
     ;
 
-declare:  /* empty */                                           { printpos("declare", false); }
+declare:  /* empty */                                           { printpos("declare", true); }
     | type  varcnst multdec                                     { printpos("declare", true); }
     ;
 
-multdec:  /* empty */                                           { printpos("multdec", false); }
+multdec:  /* empty */                                           { printpos("multdec", true); }
     | SEPARATOR varcnst multdec                                 { printpos("multdec", true); }
     ;
 
@@ -191,14 +201,16 @@ middle:   /* empty */                                           { printpos("midd
 
 %%
 
-void printpos(string cur, bool save)
+void printpos(string tokens, bool nonterm)
 {
   extern int yylineno;	// defined and maintained in lex.c
   extern char *yytext;	// defined and maintained in lex.c
 
-  cout << prev << " -> " << cur << " " << yytext << endl;
-  if(save)
-    prev = cur;
+  cout << tokens;
+  if(!nonterm)
+    cout << " " << yytext;
+  cout << endl;
+
   return;
 }
 
