@@ -5,10 +5,12 @@
 #include "heading.h"
 int yyerror(char *s);
 int yylex(void);
+void printpos(string cur, bool save);
 int intCount = 0;
 int opCount = 0;
 int parenCount = 0;
 int equalCount = 0;
+string prev = "";
 %}
 
 %union{
@@ -66,132 +68,139 @@ int equalCount = 0;
 
 %%
 
-start:    function
+start:    function                                              { printpos("start", true); }
     ;
 
-function: type  VARIABLE  L_PAREN declare R_PAREN code
+function: type  VARIABLE  L_PAREN declare R_PAREN code          { printpos("function", true); }
     ;
 
-call:   /* empty */   
-    |   VARIABLE arg
+combo:  math                                                    { printpos("combo", true); }
+    | call                                                      { printpos("combo", true); }
     ;
 
-type:     INTEGER
+call:   VARIABLE L_PAREN combo multarg R_PAREN                  { printpos("call", true); }
     ;
 
-varcnst:  VARIABLE
-    | DIGIT
-    | VARIABLE  array
+type:   INTEGER                                                 { printpos("type", false); }
     ;
 
-math:   varcnst multmath
+varcnst:  VARIABLE                                              { printpos("varcnst", false); }
+    | DIGIT                                                     { printpos("varcnst", false); }
+    | VARIABLE  array                                           { printpos("varcnst", true); }
     ;
 
-multmath:   /* empty */
-    |   arith multmath varcnst
+math:   varcnst multmath                                        { printpos("math", true); }
     ;
 
-combo:  math
-    |   call
+multmath:   /* empty */                                         { printpos("epsilon", false); }
+    |   arith multmath varcnst                                  { printpos("multmath", true); }
     ;
 
-array:    L_BRACK combo R_BRACK
+array:    L_BRACK combo R_BRACK                                 { printpos("array", true); }
     ;
 
-arraydec:  /* empty */
-    | type  VARIABLE  array END
+arraydec:  /* empty */                                          { printpos("arraydec", false); }
+    | type VARIABLE array                                       { printpos("arraydec", true); }
     ;
 
-assign:   VARIABLE  EQUAL  combo  END
+assign:   VARIABLE  EQUAL  combo                                { printpos("assign", true); }
     ;
 
-arith:    ADD
-    | SUBTRACT
-    | MULTIPLY
-    | DIVIDE
+arith:    ADD                                                   { printpos("arith", false); }
+    | SUBTRACT                                                  { printpos("arith", false); }
+    | MULTIPLY                                                  { printpos("arith", false); }
+    | DIVIDE                                                    { printpos("arith", false); }
     ;
 
-arg:      /* empty */
-    | L_PAREN combo multarg R_PAREN
+multarg:  /* empty */                                           { printpos("multarg", false); }
+    | SEPARATOR combo multarg                                   { printpos("multarg", true); }
     ;
 
-multarg:  /* empty */
-    | SEPARATOR combo multarg
+compare:  L_PAREN combo relate combo R_PAREN                    { printpos("compare", true); }
     ;
 
-compare:  L_PAREN combo relate combo R_PAREN
+declare:  /* empty */                                           { printpos("declare", false); }
+    | type  varcnst multdec                                     { printpos("declare", true); }
     ;
 
-declare:  /* empty */
-    | type  varcnst multdec
+multdec:  /* empty */                                           { printpos("multdec", false); }
+    | SEPARATOR varcnst multdec                                 { printpos("multdec", true); }
     ;
 
-multdec:  /* empty */
-    | SEPARATOR varcnst multdec
+loop:     WHILE compare code                                    { printpos("loop", true); }
+    | DO code WHILE compare                                     { printpos("loop", true); }
     ;
 
-loop:     WHILE compare code
-    | DO code WHILE compare
+case:     IF compare code elcase                                { printpos("case", true); }
     ;
 
-case:     IF compare code elcase
+elcase:   /* empty */                                           { printpos("elcase", false); }
+    | ELSE code                                                 { printpos("elcase", true); }
     ;
 
-elcase:   /* empty */
-    | ELSE code
+relate:   LESS                                                  { printpos("relate", false); }
+    | GREATER                                                   { printpos("relate", false); }
+    | LTE                                                       { printpos("relate", false); }
+    | GTE                                                       { printpos("relate", false); }
+    | COMPEQUAL                                                 { printpos("relate", false); }
+    | NOT COMPEQUAL                                             { printpos("relate", false); }
+    ;
+/*
+balbrace: L_BRACE balCode R_BRACE
     ;
 
-relate:   LESS
-    | GREATER
-    | LTE
-    | GTE
-    | COMPEQUAL
+balparen: L_PAREN balCode R_PAREN
     ;
 
-balbrace: L_BRACE balMiddle R_BRACE
-    ;
-
-balparen: L_PAREN balMiddle R_PAREN
-    ;
-
-balbrack: L_BRACK balMiddle R_BRACK
+balbrack: L_BRACK balCode R_BRACK
     ;
 
 balCode:     balbrace
     | balparen
     | balbrack
-    | ARNIE
+    | math
+    | call
     ;
 
-balMiddle:   /* empty */
+balMiddle:   /* empty 
     | balCode balMiddle
     ;
+*/
 
-
-code:     L_BRACE middle R_BRACE;
+code:     L_BRACE middle R_BRACE                                { printpos("code", true); }
     ;
 
-read:   /* empty */
-    READ VARIABLE
+read:   /* empty */                                             { printpos("read", false); }
+    READ VARIABLE                                               { printpos("read", false); }
     ;
 
-write:  /* empty */
-    WRITE VARIABLE
+write:  /* empty */                                             { printpos("write", false); }
+    WRITE VARIABLE                                              { printpos("write", false); }
     ;
 
-middle:   /* empty */
-    |   assign
-    |   declare
-    |   loop
-    |   case
-    |   code
-    |   read
-    |   write
-    |   arraydec
-    |   RETURN combo END
+middle:   /* empty */                                           { printpos("middle", true); }
+    |   assign END middle                                       { printpos("middle", true); }
+    |   declare END middle                                      { printpos("middle", true); }
+    |   loop END middle                                         { printpos("middle", true); }
+    |   case middle                                             { printpos("middle", true); }
+    |   read END middle                                         { printpos("middle", true); }
+    |   write END middle                                        { printpos("middle", true); }
+    |   arraydec END middle                                     { printpos("middle", true); }
+    |   RETURN combo END middle                                 { printpos("middle", true); }
     ;
 
 %%
+
+void printpos(string cur, bool save)
+{
+  extern int yylineno;	// defined and maintained in lex.c
+  extern char *yytext;	// defined and maintained in lex.c
+
+  cout << prev << " -> " << cur << " " << yytext << endl;
+  if(save)
+    prev = cur;
+  return;
+}
 
 int yyerror(string s)
 {
