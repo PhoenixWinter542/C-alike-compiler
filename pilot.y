@@ -71,10 +71,10 @@ string prev = "";
 start:    function                                              { printpos("start -> function", true); }
     ;
 
-function: type  VARIABLE  L_PAREN declare R_PAREN code          { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
+function: type VARIABLE L_PAREN declare R_PAREN code            { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
     ;
 
-combo:  math                                                    { printpos("combo -> math", true); }
+combo:    math                                                  { printpos("combo -> math", true); }
     | call                                                      { printpos("combo -> call", true); }
     ;
 
@@ -115,8 +115,7 @@ paren:  L_PAREN add R_PAREN                                     { printpos("pare
 array:    L_BRACK combo R_BRACK                                 { printpos("array -> L_BRACK combo R_BRACK", true); }
     ;
 
-arraydec:  /* empty */                                          { printpos("arraydec -> epsilon", true); }
-    | type VARIABLE array                                       { printpos("arraydec -> type VARIABLE array", true); }
+arraydec: VARIABLE array                                        { printpos("arraydec -> VARIABLE array", true); }     /* type gives the reduce/reduce warning */
     ;
 
 assign:   VARIABLE  EQUAL  combo                                { printpos("assign ->  VARIABLE  EQUAL  combo", true); }
