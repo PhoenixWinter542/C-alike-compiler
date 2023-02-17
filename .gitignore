@@ -9,3 +9,7 @@ lex.o
 lex.yy.c
 main.o
 tok.h
+pilot
+pilot.output
+pilot.tab.c
+pilot.tab.h

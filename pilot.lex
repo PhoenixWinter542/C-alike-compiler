@@ -46,9 +46,9 @@ WHILE       while
 DO          do
 
 /* Storage */
-VARIABLE    {ALPHA}(_?{ALNUM})*
 READ        read
 WRITE       write
+VARIABLE    {ALPHA}(_?{ALNUM})*
 
 /* Types */
 INTEGER     "int"
