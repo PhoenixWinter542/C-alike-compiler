@@ -1,0 +1,11 @@
+bison.c
+bison.o
+calc
+calc.output
+calc.tab.c
+calc.tab.h
+lex.c
+lex.o
+lex.yy.c
+main.o
+tok.h

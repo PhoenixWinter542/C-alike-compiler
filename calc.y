@@ -18,44 +18,63 @@ int equalCount = 0;
 
 %start	start
 
-%left	DIGIT
-%left	SPACE
-%left	VARIABLE
-%left	INTEGER
+/* Comparisons */
 %left	LESS
 %left	GREATER
 %left	LTE
 %left	GTE
-%left	EQUAL
+%left   COMPEQUAL
 %left	NOT
+
+/* Math */
 %left	ADD
 %left	SUBTRACT
 %left	MULTIPLY
 %left	DIVIDE
-%left	WHILE
+%left	DIGIT
+
+/* () {} [] */
 %left	L_PAREN
 %left	R_PAREN
 %left	L_BRACK
 %left	R_BRACK
 %left	L_BRACE
 %left	R_BRACE
-%left	IF
-%left	ELSE
-%left	READ
-%left	WRITE
+
+/* Symbols */
 %left	END
 %left	SEPARATOR
+%left	EQUAL
 %left	RETURN
-%left	NEWLINE
-%left COMPEQUAL
-%left DO
+%left   ARNIE
+
+/* Conditionals */
+%left	IF
+%left	ELSE
+
+/* Loops */
+%left	WHILE
+%left   DO
+
+/* Storage */
+%left	VARIABLE
+%left	READ
+%left	WRITE
+
+/* Types */
+%left	INTEGER
+
+/* Whitespace */
+%left	SPACE
+%left   OPTSPACE
+
 
 %%
 
 start:    function
     ;
 
-function: type SPACE VARIABLE SPACE L_PAREN declare R_PAREN code
+function: type SPACE VARIABLE OPTSPACE L_PAREN declare R_PAREN code
     ;
 
 call:   /* empty */   
@@ -85,24 +104,16 @@ array:    L_BRACK combo R_BRACK
     ;
 
 arraydec:  /* empty */
-    | type SPACE VARIABLE SPACE array END
+    | type SPACE VARIABLE OPTSPACE array END
     ;
 
-assign:   VARIABLE SPACE EQUAL SPACE combo SPACE END
+assign:   VARIABLE OPTSPACE EQUAL OPTSPACE combo OPTSPACE END
     ;
 
 arith:    ADD
     | SUBTRACT
     | MULTIPLY
     | DIVIDE
-    ;
-
-arnie:    SPACE
-    | SEPARATOR
-    | END
-    | R_BRACE
-    | R_BRACK
-    | R_PAREN
     ;
 
 arg:      /* empty */
@@ -157,7 +168,7 @@ balbrack: L_BRACK balMiddle R_BRACK
 balCode:     balbrace
     | balparen
     | balbrack
-    | arnie
+    | ARNIE
     ;
 
 balMiddle:   /* empty */
