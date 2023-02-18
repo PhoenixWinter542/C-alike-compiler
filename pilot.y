@@ -71,14 +71,14 @@ string expect = "";
 start:    { expect = "function"; } function                                              { printpos("start -> function", true); }
     ;
 
-function: { expect = "INTEGER"; } type { expect = "VARIABLE"; } VARIABLE { expect = "L_PAREN"; } L_PAREN { expect = "declare"; } declare { expect = "R_PAREN"; } R_PAREN { expect = "code"; } code           { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
+function: { expect = "INTEGER"; } type { expect = "VARIABLE"; } VARIABLE { expect = "L_PAREN"; } L_PAREN { expect = "epsilon or INTEGER"; } declare { expect = "R_PAREN"; } R_PAREN { expect = "epsilon, VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN"; } code           { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
     ;
 
-combo:   math                                                  { expect = "add or sub"; printpos("combo -> math", true); }
+combo:   math                                                  { expect = "VARIABLE, DIGIT, or L_PAREN"; printpos("combo -> math", true); }
     | call                                                      { expect = "VARIABLE"; printpos("combo -> call", true); }
     ;
 
-call:   VARIABLE { expect = "L_PAREN"; } L_PAREN { expect = "add or VARIABLE"; } combo { expect = "multarg"; } multarg { expect = "R_PAREN"; } R_PAREN                  { printpos("call -> VARIABLE L_PAREN combo multarg R_PAREN", true); }
+call:   VARIABLE { expect = "L_PAREN"; } L_PAREN { expect = "VARIABLE, DIGIT, or L_PAREN"; } combo { expect = "multarg"; } multarg { expect = "R_PAREN"; } R_PAREN                  { printpos("call -> VARIABLE L_PAREN combo multarg R_PAREN", true); }
     ;
 
 type:   INTEGER                                                 { printpos("type -> INTEGER", false); }
@@ -86,47 +86,47 @@ type:   INTEGER                                                 { printpos("type
 
 varcnst:  VARIABLE                                              { printpos("varcnst -> VARIABLE", false); }
     | DIGIT                                                     { printpos("varcnst -> DIGIT", false); }
-    | VARIABLE { expect = "array"; }  array                                           { expect = "L_BRACK"; printpos("varcnst -> VARIABLE array", true); }
+    | VARIABLE { expect = "L_BRACK"; }  array                                           { expect = "L_BRACK"; printpos("varcnst -> VARIABLE array", true); }
     ;
 
 math:   add                                                     { printpos("math -> add", true); }
     ;
 
-add:    add { expect = "ADD"; } ADD { expect = "varcnst or L_PAREN"; } sub                                             { expect = "varcnst or L_PAREN"; printpos("add -> add ADD sub", true); }
-    | sub                                                       { expect = "varcnst or L_PAREN"; printpos("add -> sub", true); }
+add:    add { expect = "ADD"; } ADD { expect = "VARIABLE, DIGIT, or L_PAREN"; } sub                                             { expect = "VARIABLE, DIGIT, or L_PAREN"; printpos("add -> add ADD sub", true); }
+    | sub                                                       { expect = "VARIABLE, DIGIT, or L_PAREN"; printpos("add -> sub", true); }
 	;
 
-sub:    sub { expect = "SUBTRACT"; } SUBTRACT { expect = "varcnst or L_PAREN"; } mult                                       { expect = "varcnst or L_PAREN"; printpos("sub -> sub SUBTRACT mult", true); }
-    | mult                                                      { expect = "varcnst or L_PAREN"; printpos("sub -> mult", true); }
+sub:    sub { expect = "SUBTRACT"; } SUBTRACT { expect = "VARIABLE, DIGIT, or L_PAREN"; } mult                                       { expect = "VARIABLE, DIGIT, or L_PAREN"; printpos("sub -> sub SUBTRACT mult", true); }
+    | mult                                                      { expect = "VARIABLE, DIGIT, or L_PAREN"; printpos("sub -> mult", true); }
     ;
 
-mult:   mult { expect = "MULT"; } MULTIPLY { expect = "varcnst or L_PAREN"; } div                                       { expect = "varcnst or L_PAREN"; printpos("mult -> mult MULTIPLY div", true); }
-    | div                                                       { expect = "varcnst or L_PAREN"; printpos("mult -> div", true); }
+mult:   mult { expect = "MULT"; } MULTIPLY { expect = "VARIABLE, DIGIT, or L_PAREN"; } div                                       { expect = "VARIABLE, DIGIT, or L_PAREN"; printpos("mult -> mult MULTIPLY div", true); }
+    | div                                                       { expect = "VARIABLE, DIGIT, or L_PAREN"; printpos("mult -> div", true); }
     ;
 
-div:    div { expect = "DIVIDE"; } DIVIDE { expect = "varcnst or L_PAREN"; } paren                                        { expect = "L_PAREN or varcnst"; printpos("div -> div DIVIDE paren", true); }
-    | paren                                                     { expect = "L_PAREN or varcnst"; printpos("div -> paren", true); }
+div:    div { expect = "DIVIDE"; } DIVIDE { expect = "VARIABLE, DIGIT, or L_PAREN"; } paren                                        { expect = "L_PAREN, VARIABLE, or DIGIT"; printpos("div -> div DIVIDE paren", true); }
+    | paren                                                     { expect = "L_PAREN, VARIABLE, or DIGIT"; printpos("div -> paren", true); }
     ;
 
-paren:  L_PAREN { expect = "varcnst or L_PAREN"; } add { expect = "R_PAREN"; } R_PAREN                                     { printpos("paren -> L_PAREN add R_PAREN", true); }
+paren:  L_PAREN { expect = "VARIABLE, DIGIT, or L_PAREN"; } add { expect = "R_PAREN"; } R_PAREN                                     { printpos("paren -> L_PAREN add R_PAREN", true); }
     | varcnst                                                   { printpos("paren -> varcnst", true); }
     ;
 
 
-array:    L_BRACK { expect = "add or VARIABLE"; } combo { expect = "R_BRACK"; } R_BRACK                                 { printpos("array -> L_BRACK combo R_BRACK", true); }
+array:    L_BRACK { expect = "VARIABLE, DIGIT, or L_PAREN"; } combo { expect = "R_BRACK"; } R_BRACK                                 { printpos("array -> L_BRACK combo R_BRACK", true); }
     ;
 
-arraydec: VARIABLE { expect = "array"; } array                                        { printpos("arraydec -> VARIABLE array", true); }     /* type gives the reduce/reduce warning */
+arraydec: VARIABLE { expect = "L_BRACK"; } array                                        { printpos("arraydec -> VARIABLE array", true); }     /* type gives the reduce/reduce warning */
     ;
 
-assign:   VARIABLE  { expect = "EQUAL"; } EQUAL  { expect = "add or VARIABLE"; } combo                                { printpos("assign ->  VARIABLE  EQUAL  combo", true); }
+assign:   VARIABLE  { expect = "EQUAL"; } EQUAL  { expect = "VARIABLE, DIGIT, or L_PAREN"; } combo                                { printpos("assign ->  VARIABLE  EQUAL  combo", true); }
     ;
 
 multarg:  /* empty */                                           { printpos("multarg -> epsilon", true); }
-    | SEPARATOR { expect = "add or VARIABLE"; } combo { expect = "multarg"; } multarg                                   { printpos("multarg -> SEPARATOR combo multarg", true); }
+    | SEPARATOR { expect = "VARIABLE, DIGIT, or L_PAREN"; } combo { expect = "SEPARATOR"; } multarg                                   { printpos("multarg -> SEPARATOR combo multarg", true); }
     ;
 
-compare:  { expect = "L_PAREN"; } L_PAREN { expect = "add or VARIABLE"; } combo { expect = "relate"; } relate { expect = "add or VARIABLE"; } combo { expect = "R_PAREN"; } R_PAREN                    { printpos("compare -> L_PAREN combo relate combo R_PAREN", true); }
+compare:  { expect = "L_PAREN"; } L_PAREN { expect = "VARIABLE, DIGIT, or L_PAREN"; } combo { expect = "LESS, GREATER, LTE, GTE, COMPEQUAL, or NOT COMPEQUAL"; } relate { expect = "VARIABLE, DIGIT, or L_PAREN"; } combo { expect = "R_PAREN"; } R_PAREN                    { printpos("compare -> L_PAREN combo relate combo R_PAREN", true); }
     ;
 
 declare:  /* empty */                                           { printpos("declare -> epsilon", true); }
@@ -137,15 +137,15 @@ multdec:  /* empty */                                           { printpos("mult
     | SEPARATOR { expect = "VARIABLE or DIGIT"; } varcnst { expect = "multdec"; } multdec                                 { printpos("multdec -> SEPARATOR varcnst multdec", true); }
     ;
 
-loop:     WHILE { expect = "compare"; } compare { expect = "code"; } code                                    { printpos("loop -> WHILE compare code", true); }
-    | DO { expect = "code"; } code { expect = "while"; } WHILE { expect = "compare"; } compare                                     { printpos("loop -> DO code WHILE compare", true); }
+loop:     WHILE { expect = "compare"; } compare { expect = "epsilon, VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN"; } code                                    { printpos("loop -> WHILE compare code", true); }
+    | DO { expect = "epsilon, VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN"; } code { expect = "while"; } WHILE { expect = "compare"; } compare                                     { printpos("loop -> DO code WHILE compare", true); }
     ;
 
-case:     { expect = "IF"; } IF { expect = "compare"; } compare { expect = "code"; } code { expect = "elcase"; } elcase                                { printpos("case -> IF compare code elcase", true); }
+case:     { expect = "IF"; } IF { expect = "compare"; } compare { expect = "epsilon, VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN"; } code { expect = "elcase"; } elcase                                { printpos("case -> IF compare code elcase", true); }
     ;
 
 elcase:   /* empty */                                           { printpos("elcase -> epsilon", false); }
-    | ELSE { expect = "code"; } code                                                 { printpos("elcase -> ELSE code", true); }
+    | ELSE { expect = "epsilon, VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN"; } code                                                 { printpos("elcase -> ELSE code", true); }
     ;
 
 relate:   LESS                                                  { printpos("relate -> LESS", false); }
@@ -156,7 +156,7 @@ relate:   LESS                                                  { printpos("rela
     | NOT COMPEQUAL                                             { printpos("relate -> NOT COMPEQUAL", false); }
     ;
 
-code:     { expect = "L_BRACE"; }L_BRACE { expect = "middle"; } middle { expect = "R_BRACE"; } R_BRACE                                { printpos("code -> L_BRACE middle R_BRACE", true); }
+code:     { expect = "L_BRACE"; }L_BRACE { expect = "epsilon, VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN"; } middle { expect = "R_BRACE"; } R_BRACE                                { printpos("code -> L_BRACE middle R_BRACE", true); }
     ;
 
 middle:   /* empty */                                           { printpos("middle -> epsilon", true); }
