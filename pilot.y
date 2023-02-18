@@ -71,14 +71,14 @@ string expect = "";
 start:    { expect = "function"; } function                                              { printpos("start -> function", true); }
     ;
 
-function: type VARIABLE L_PAREN declare R_PAREN code           { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
+function: { expect = "type"; } type { expect = "VARIABLE"; } VARIABLE { expect = "L_PAREN"; } L_PAREN { expect = "declare"; } declare { expect = "R_PAREN"; } R_PAREN { expect = "code"; } code           { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
     ;
 
-combo:    math                                                  { printpos("combo -> math", true); }
+combo:   math                                                  { printpos("combo -> math", true); }
     | call                                                      { printpos("combo -> call", true); }
     ;
 
-call:   VARIABLE L_PAREN combo multarg R_PAREN                  { printpos("call -> VARIABLE L_PAREN combo multarg R_PAREN", true); }
+call:   VARIABLE { expect = "L_PAREN"; } L_PAREN { expect = "combo"; } combo { expect = "multarg"; } multarg { expect = "R_PAREN"; } R_PAREN                  { printpos("call -> VARIABLE L_PAREN combo multarg R_PAREN", true); }
     ;
 
 type:   INTEGER                                                 { printpos("type -> INTEGER", false); }
@@ -86,66 +86,66 @@ type:   INTEGER                                                 { printpos("type
 
 varcnst:  VARIABLE                                              { printpos("varcnst -> VARIABLE", false); }
     | DIGIT                                                     { printpos("varcnst -> DIGIT", false); }
-    | VARIABLE  array                                           { printpos("varcnst -> VARIABLE array", true); }
+    | VARIABLE { expect = "array"; }  array                                           { printpos("varcnst -> VARIABLE array", true); }
     ;
 
 math:   add                                                     { printpos("math -> add", true); }
     ;
 
-add:    add ADD sub                                             { printpos("add -> add ADD sub", true); }
+add:    add { expect = "ADD"; } ADD { expect = "sub"; } sub                                             { printpos("add -> add ADD sub", true); }
     | sub                                                       { printpos("add -> sub", true); }
 	;
 
-sub:    sub SUBTRACT mult                                       { printpos("sub -> sub SUBTRACT mult", true); }
+sub:    sub { expect = "SUBTRACT"; } SUBTRACT { expect = "mult"; } mult                                       { printpos("sub -> sub SUBTRACT mult", true); }
     | mult                                                      { printpos("sub -> mult", true); }
     ;
 
-mult:   mult MULTIPLY div                                       { printpos("mult -> mult MULTIPLY div", true); }
+mult:   mult { expect = "MULT"; } MULTIPLY { expect = "div"; } div                                       { printpos("mult -> mult MULTIPLY div", true); }
     | div                                                       { printpos("mult -> div", true); }
     ;
 
-div:    div DIVIDE paren                                        { printpos("div -> div DIVIDE paren", true); }
+div:    div { expect = "DIVIDE"; } DIVIDE { expect = "paren"; } paren                                        { printpos("div -> div DIVIDE paren", true); }
     | paren                                                     { printpos("div -> paren", true); }
     ;
 
-paren:  L_PAREN add R_PAREN                                     { printpos("paren -> L_PAREN add R_PAREN", true); }
+paren:  L_PAREN { expect = "add"; } add { expect = "R_PAREN"; } R_PAREN                                     { printpos("paren -> L_PAREN add R_PAREN", true); }
     | varcnst                                                   { printpos("paren -> varcnst", true); }
     ;
 
 
-array:    L_BRACK combo R_BRACK                                 { printpos("array -> L_BRACK combo R_BRACK", true); }
+array:    L_BRACK { expect = "combo"; } combo { expect = "R_BRACK"; } R_BRACK                                 { printpos("array -> L_BRACK combo R_BRACK", true); }
     ;
 
-arraydec: VARIABLE array                                        { printpos("arraydec -> VARIABLE array", true); }     /* type gives the reduce/reduce warning */
+arraydec: VARIABLE { expect = "array"; } array                                        { printpos("arraydec -> VARIABLE array", true); }     /* type gives the reduce/reduce warning */
     ;
 
-assign:   VARIABLE  EQUAL  combo                                { printpos("assign ->  VARIABLE  EQUAL  combo", true); }
+assign:   VARIABLE  { expect = "EQUAL"; } EQUAL  { expect = "combo"; } combo                                { printpos("assign ->  VARIABLE  EQUAL  combo", true); }
     ;
 
 multarg:  /* empty */                                           { printpos("multarg -> epsilon", true); }
-    | SEPARATOR combo multarg                                   { printpos("multarg -> SEPARATOR combo multarg", true); }
+    | SEPARATOR { expect = "combo"; } combo { expect = "multarg"; } multarg                                   { printpos("multarg -> SEPARATOR combo multarg", true); }
     ;
 
-compare:  L_PAREN combo relate combo R_PAREN                    { printpos("compare -> L_PAREN combo relate combo R_PAREN", true); }
+compare:  { expect = "L_PAREN"; } L_PAREN { expect = "combo"; } combo { expect = "relate"; } relate { expect = "combo"; } combo { expect = "R_PAREN"; } R_PAREN                    { printpos("compare -> L_PAREN combo relate combo R_PAREN", true); }
     ;
 
 declare:  /* empty */                                           { printpos("declare -> epsilon", true); }
-    | type varcnst multdec                                     { printpos("declare -> type varcnst multdec", true); }
+    | type { expect = "varcnst"; } varcnst { expect = "multdec"; } multdec                                     { printpos("declare -> type varcnst multdec", true); }
     ;
 
 multdec:  /* empty */                                           { printpos("multdec -> epsilon", true); }
-    | SEPARATOR varcnst multdec                                 { printpos("multdec -> SEPARATOR varcnst multdec", true); }
+    | SEPARATOR { expect = "varcnst"; } varcnst { expect = "multdec"; } multdec                                 { printpos("multdec -> SEPARATOR varcnst multdec", true); }
     ;
 
-loop:     WHILE compare code                                    { printpos("loop -> WHILE compare code", true); }
-    | DO code WHILE compare                                     { printpos("loop -> DO code WHILE compare", true); }
+loop:     WHILE { expect = "compare"; } compare { expect = "code"; } code                                    { printpos("loop -> WHILE compare code", true); }
+    | DO { expect = "code"; } code { expect = "while"; } WHILE { expect = "compare"; } compare                                     { printpos("loop -> DO code WHILE compare", true); }
     ;
 
-case:     IF compare code elcase                                { printpos("case -> IF compare code elcase", true); }
+case:     { expect = "IF"; } IF { expect = "compare"; } compare { expect = "code"; } code { expect = "elcase"; } elcase                                { printpos("case -> IF compare code elcase", true); }
     ;
 
 elcase:   /* empty */                                           { printpos("elcase -> epsilon", false); }
-    | ELSE code                                                 { printpos("elcase -> ELSE code", true); }
+    | ELSE { expect = "code"; } code                                                 { printpos("elcase -> ELSE code", true); }
     ;
 
 relate:   LESS                                                  { printpos("relate -> LESS", false); }
@@ -155,40 +155,19 @@ relate:   LESS                                                  { printpos("rela
     | COMPEQUAL                                                 { printpos("relate -> COMPEQUAL", false); }
     | NOT COMPEQUAL                                             { printpos("relate -> NOT COMPEQUAL", false); }
     ;
-/*
-balbrace: L_BRACE balCode R_BRACE
-    ;
 
-balparen: L_PAREN balCode R_PAREN
-    ;
-
-balbrack: L_BRACK balCode R_BRACK
-    ;
-
-balCode:     balbrace
-    | balparen
-    | balbrack
-    | math
-    | call
-    ;
-
-balMiddle:   /* empty 
-    | balCode balMiddle
-    ;
-*/
-
-code:     L_BRACE middle R_BRACE                                { printpos("code -> L_BRACE middle R_BRACE", true); }
+code:     L_BRACE { expect = "middle"; } middle { expect = "R_BRACE"; } R_BRACE                                { printpos("code -> L_BRACE middle R_BRACE", true); }
     ;
 
 middle:   /* empty */                                           { printpos("middle -> epsilon", true); }
-    |   assign END middle                                       { printpos("middle -> assign END middle", true); }
-    |   declare END middle                                      { printpos("middle -> declare END middle", true); }
-    |   loop END middle                                         { printpos("middle -> loop END middle", true); }
-    |   case middle                                             { printpos("middle -> read END middle", true); }
-    |   read END middle                                         { printpos("middle -> read END middle", true); }
-    |   write END middle                                        { printpos("middle -> write END middle", true); }
-    |   arraydec END middle                                     { printpos("middle -> arraydec END middle", true); }
-    |   RETURN { expect = ""; } combo { expect = "END"; } END { expect = "middle"; } middle                                 { printpos("middle -> RETURN combo END middle", true); }
+    |   assign { expect = "END"; } END { expect = "middle"; } middle                                       { printpos("middle -> assign END middle", true); }
+    |   declare { expect = "END"; } END { expect = "middle"; } middle                                      { printpos("middle -> declare END middle", true); }
+    |   loop { expect = "END"; } END { expect = "middle"; } middle                                         { printpos("middle -> loop END middle", true); }
+    |   case { expect = "middle"; } middle                                             { printpos("middle -> read END middle", true); }
+    |   read { expect = "END"; } END { expect = "middle"; } middle                                         { printpos("middle -> read END middle", true); }
+    |   write { expect = "END"; } END { expect = "middle"; } middle                                        { printpos("middle -> write END middle", true); }
+    |   arraydec { expect = "END"; } END { expect = "middle"; } middle                                     { printpos("middle -> arraydec END middle", true); }
+    |   RETURN { expect = "END"; } combo { expect = "END"; } END { expect = "middle"; } middle                                 { printpos("middle -> RETURN combo END middle", true); }
     ;
 
 read:   /* empty */                                             { printpos("read -> epsilon", false); }
@@ -203,7 +182,6 @@ write:  /* empty */                                             { printpos("writ
 
 void printpos(string tokens, bool nonterm)
 {
-  extern int yylineno;	// defined and maintained in lex.c
   extern char *yytext;	// defined and maintained in lex.c
 
   cout << tokens;
@@ -219,7 +197,7 @@ int yyerror(string s)
   extern int yylineno;	// defined and maintained in lex.c
   extern char *yytext;	// defined and maintained in lex.c
   
-  cerr << "ERROR: " << s << " at symbol \"" << yytext;
+  cerr << "ERROR: "  << " at symbol \"" << yytext;
   cerr << "\" on line " << yylineno << endl;
   cout << "EXPECTED: " << expect << endl;
   exit(1);
