@@ -15,3 +15,4 @@ pilot.tab.c
 pilot.tab.h
 compile
 parser
+compiler
