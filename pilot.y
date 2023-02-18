@@ -78,7 +78,7 @@ call:		VARIABLE { expect = "(";} L_PAREN { expect = "add";} add { expect = "mult
 	;
 
 /* List of accepted types */
-type:		INTEGER																																				{ printpos("type -> INTEGER", false); }
+type:		INTEGER																																				{ printpos("type -> INTEGER", true); }
 	;
 
 /* Variables, constants, and things that return constants */
@@ -121,7 +121,7 @@ arraydec:	VARIABLE { expect = "array";} array																													{ prin
 	;
 
 /* Assigns a value to a variable */
-assign:		VARIABLE  { expect = "=";} EQUAL  { expect = "add";} add																							{ printpos("assign ->  VARIABLE  EQUAL  add", true); }
+assign:		VARIABLE { expect = "=";} EQUAL { expect = "add";} add																								{ printpos("assign ->  VARIABLE  EQUAL  add", true); }
 	;
 
 /* Handles having more than one argument */
@@ -144,8 +144,11 @@ multdec:	/* empty */																																			{ printpos("multdec -> ep
 	;
 
 /* Declaration of local variables */
-init:		type assign																																			{ printpos("init -> type assign", true); }
-	|	type VARIABLE																																			{ printpos("init -> type assign", false); }
+init:		type { expect = "VARIABLE"; } VARIABLE { expect = "initassign"; } initassign																		{ printpos("init -> type VARIABLE initassign", true); }
+	;
+
+initassign:	/* empty */																																			{ printpos("initassign -> epsilon", true); }
+	|	EQUAL { expect = "add"; } add																															{ printpos("initassign ->  EQUAL add", true); }
 	;
 
 /* Currently handles "do while" and "while" loops */
@@ -198,60 +201,61 @@ write:	WRITE { expect = "VARIABLE"; } VARIABLE																													{ pri
 %%
 
 string choosenext(string next){
-
-    if("start")
+    if("start" == next)
         return "INTEGER";
-    else if("multfunc")
+    else if("multfunc" == next)
         return "INTEGER";
-    else if("function")
+    else if("function" == next)
         return "INTEGER";
-    else if("call")
+    else if("call" == next)
         return "VARIABLE";
-    else if("type")
+    else if("type" == next)
         return "INTEGER";
-    else if("varcnst")
+    else if("varcnst" == next)
         return "VARIABLE, DIGIT";
-    else if("add")
+    else if("add" == next)
         return "VARIABLE, DIGIT, (";
-    else if("sub")
+    else if("sub" == next)
         return "VARIABLE, DIGIT, (";
-    else if("mult")
+    else if("mult" == next)
         return "VARIABLE, DIGIT, (";
-    else if("div")
+    else if("div" == next)
         return "VARIABLE, DIGIT, (";
-    else if("paren")
+    else if("paren" == next)
         return "VARIABLE, DIGIT, (";
-    else if("array")
+    else if("array" == next)
         return "[";
-    else if("arraydec")
+    else if("arraydec" == next)
         return "VARIABLE";
-    else if("assign")
+    else if("assign" == next)
         return "VARIABLE";
-    else if("multarg")
+    else if("multarg" == next)
         return "), ','";
-    else if("compare")
+    else if("compare" == next)
         return "(";
-    else if("declare")
+    else if("declare" == next)
         return "INTEGER, )";
-    else if("multdec")
+    else if("multdec" == next)
         return "), ','";
-    else if("init")
+    else if("init" == next)
         return "INTEGER";
-    else if("loop")
+	else if ("initassign" == next)
+		return "=, ;";
+    else if("loop" == next)
         return "WHILE, DO";
-    else if("case")
+    else if("case" == next)
         return "IF";
-    else if("elcase")
+    else if("elcase" == next)
         return "ELSE";
-    else if("relate")
+    else if("relate" == next)
         return "<, >, <=, >=, ==, !=";
-    else if("code")
+    else if("code" == next)
         return "{";
-    else if("middle")
+    else if("middle" == next)
         return "VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN, }";
-    else if("read")
+    else if("read" == next)
         return "READ";
-    else if("write")
+    else if("write" == next)
         return "WRITE";
     else //Terminal is next
         return next;
