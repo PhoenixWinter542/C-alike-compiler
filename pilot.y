@@ -67,7 +67,11 @@ string expect = "";
 
 %%
 
-start:    { expect = "function"; } function                                             { printpos("start -> function", true); }
+start:    { expect = "function"; } function multfunc                                             { printpos("start -> function", true); }
+    ;
+
+multfunc: /* empty */
+    | function multfunc
     ;
 
 function: { expect = "INTEGER"; } type { expect = "VARIABLE"; } VARIABLE { expect = "L_PAREN"; } L_PAREN { expect = "epsilon or INTEGER"; } declare { expect = "R_PAREN"; } R_PAREN { expect = "epsilon, VARIABLE, INTEGER, WHILE, DO, IF, READ, WRITE, RETURN"; } code           { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
