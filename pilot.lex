@@ -57,7 +57,7 @@ INTEGER     "int"
 /*-------------------------------------------------------------------------------*/
 
 /* Utility */
-SPACE       [ \t]+
+SPACE       [ \t\n]+
 ARNIE       {SPACE}|{SEPARATOR}|{END}|{R_BRACE}|{R_BRACK}|{R_PAREN}
 ALPHA       [a-zA-Z]
 ALNUM       [a-zA-Z0-9]+
