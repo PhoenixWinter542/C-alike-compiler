@@ -3,10 +3,6 @@
 int yyerror(char *s);
 int yylex(void);
 void printpos(string tokens, bool nonterm);
-int intCount = 0;
-int opCount = 0;
-int parenCount = 0;
-int equalCount = 0;
 string expect = "start";
 %}
 
