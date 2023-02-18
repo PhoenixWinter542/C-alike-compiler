@@ -21,7 +21,7 @@ ADD         "+"
 SUBTRACT    "-"
 MULTIPLY    "\*"
 DIVIDE      "/"
-DIGIT     [0-9]+{ARNIE}
+DIGIT     [0-9]+
 
 /* () {} [] */
 L_PAREN     \(
@@ -57,8 +57,6 @@ INTEGER     "int"
 /*-------------------------------------------------------------------------------*/
 
 /* Utility */
-SPACE       [ \t\n]+
-ARNIE       {SPACE}|{SEPARATOR}|{END}|{R_BRACE}|{R_BRACK}|{R_PAREN}
 ALPHA       [a-zA-Z]
 ALNUM       [a-zA-Z0-9]+
 
