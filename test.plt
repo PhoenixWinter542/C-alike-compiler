@@ -2,7 +2,11 @@ int fibonacci ( int k ) {
     if ( k <= 1 ){
         return 1 ;
     }
-    return fibonacci( k - 1 ) + fibonacci( k - 2 ) ;
+    int a;
+    int b;
+    a = fibonacci( k - 1 ) ;
+    b = fibonacci( k - 2 ) ;
+    return a + b;
 }
 
 int main(){
