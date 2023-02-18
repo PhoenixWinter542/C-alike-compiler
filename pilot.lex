@@ -57,7 +57,7 @@ INTEGER     "int"
 /*-------------------------------------------------------------------------------*/
 
 /* Utility */
-SPACE       [ \t\n]+
+SPACE       [ \t]+
 ARNIE       {SPACE}|{SEPARATOR}|{END}|{R_BRACE}|{R_BRACK}|{R_PAREN}
 ALPHA       [a-zA-Z]
 ALNUM       [a-zA-Z0-9]+
@@ -95,7 +95,6 @@ ALNUM       [a-zA-Z0-9]+
 {SEPARATOR} { yylval.op_val = new std::string(yytext); return SEPARATOR; }
 {EQUAL}	    { yylval.op_val = new std::string(yytext); return EQUAL; }
 {RETURN}	{ yylval.op_val = new std::string(yytext); return RETURN; }
-{ARNIE}   	{ yylval.op_val = new std::string(yytext); return ARNIE; }
  /* Conditionals */
 {IF}    	{ yylval.op_val = new std::string(yytext); return IF; }
 {ELSE}	    { yylval.op_val = new std::string(yytext); return ELSE; }
