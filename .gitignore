@@ -14,4 +14,4 @@ pilot.output
 pilot.tab.c
 pilot.tab.h
 compile
-compiler
+parser
