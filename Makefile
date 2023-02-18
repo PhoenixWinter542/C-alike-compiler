@@ -5,8 +5,8 @@ OBJS	= bison.o lex.o main.o
 CC	= g++
 CFLAGS	= -g -Wall -ansi -pedantic
 
-pilot:		$(OBJS)
-		$(CC) $(CFLAGS) $(OBJS) -o pilot -lfl
+compiler:		$(OBJS)
+		$(CC) $(CFLAGS) $(OBJS) -o compiler -lfl
 
 lex.o:		lex.c
 		$(CC) $(CFLAGS) -c lex.c -o lex.o
@@ -30,5 +30,5 @@ lex.o yac.o main.o	: heading.h
 lex.o main.o		: tok.h
 
 clean:
-	rm -f *.o *~ lex.c lex.yy.c bison.c tok.h pilot.tab.c pilot.tab.h pilot.output pilot
+	rm -f *.o *~ lex.c lex.yy.c bison.c tok.h pilot.tab.c pilot.tab.h pilot.output compiler
 
