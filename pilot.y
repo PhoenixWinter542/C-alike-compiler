@@ -10,7 +10,7 @@ int intCount = 0;
 int opCount = 0;
 int parenCount = 0;
 int equalCount = 0;
-string prev = "";
+string expect = "";
 %}
 
 %union{
@@ -68,10 +68,10 @@ string prev = "";
 
 %%
 
-start:    function                                              { printpos("start -> function", true); }
+start:    { expect = "function"; } function                                              { printpos("start -> function", true); }
     ;
 
-function: type VARIABLE L_PAREN declare R_PAREN code            { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
+function: type VARIABLE L_PAREN declare R_PAREN code           { printpos("function -> type VARIABLE L_PAREN declare R_PAREN code", true); }
     ;
 
 combo:    math                                                  { printpos("combo -> math", true); }
@@ -110,6 +110,7 @@ div:    div DIVIDE paren                                        { printpos("div 
 
 paren:  L_PAREN add R_PAREN                                     { printpos("paren -> L_PAREN add R_PAREN", true); }
     | varcnst                                                   { printpos("paren -> varcnst", true); }
+    ;
 
 
 array:    L_BRACK combo R_BRACK                                 { printpos("array -> L_BRACK combo R_BRACK", true); }
@@ -187,7 +188,7 @@ middle:   /* empty */                                           { printpos("midd
     |   read END middle                                         { printpos("middle -> read END middle", true); }
     |   write END middle                                        { printpos("middle -> write END middle", true); }
     |   arraydec END middle                                     { printpos("middle -> arraydec END middle", true); }
-    |   RETURN combo END middle                                 { printpos("middle -> RETURN combo END middle", true); }
+    |   RETURN { expect = ""; } combo { expect = "END"; } END { expect = "middle"; } middle                                 { printpos("middle -> RETURN combo END middle", true); }
     ;
 
 read:   /* empty */                                             { printpos("read -> epsilon", false); }
@@ -220,6 +221,7 @@ int yyerror(string s)
   
   cerr << "ERROR: " << s << " at symbol \"" << yytext;
   cerr << "\" on line " << yylineno << endl;
+  cout << "EXPECTED: " << expect << endl;
   exit(1);
 }
 

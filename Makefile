@@ -6,7 +6,7 @@ CC	= g++
 CFLAGS	= -g -Wall -ansi -pedantic
 
 pilot:		$(OBJS)
-		$(CC) $(CFLAGS) $(OBJS) -o pilot -lfl
+		$(CC) $(CFLAGS) $(OBJS) -o compile -lfl
 
 lex.o:		lex.c
 		$(CC) $(CFLAGS) -c lex.c -o lex.o
