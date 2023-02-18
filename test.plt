@@ -2,18 +2,13 @@ int fibonacci(int k){
     if (k <= 1 ) {
         return 1;
     }
-    int a;
-    int b;
-    a = fibonacci( k - 1 );
-    b = fibonacci( k - 2 );
-    return a + b;
+    return fibonacci( k - 1 ) + fibonacci( k - 2 );
 }
 
 int main(){
     int n;
-    int fib_n;
 
     read n;
-    fib_n = fibonacci( n );
+    int fib_n = fibonacci( n );
     write fib_n;
 }
