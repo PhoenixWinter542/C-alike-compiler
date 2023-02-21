@@ -4,7 +4,18 @@ int fibonacci(int k){
     if (k <= 1 ) {
         return 1;
     }
-    return fibonacci( k - 1 ) + fibonacci( k - 2 );
+    return k * fibonacci( k - 1 );
+}
+
+int newFunc(int n) {
+    while (n != 10) {
+        n = n + 1;
+    }
+
+    do {
+        n = n + 1;
+    }
+    while (n != 10);
 }
 
 int main(){

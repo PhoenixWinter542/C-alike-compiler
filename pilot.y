@@ -160,7 +160,7 @@ initassign:	/* empty */																																						{ printpos("initass
 
 /* Currently handles "do while" and "while" loops */
 loop:		WHILE { expect = "compare";} compare { expect = "code";} code																									{ printpos("loop -> WHILE compare code", true); }
-	|	DO { expect = "code";} code { expect = "while";} WHILE { expect = "compare";} compare																				{ printpos("loop -> DO code WHILE compare", true); }
+	|	DO { expect = "code";} code { expect = "while";} WHILE { expect = "compare";} compare { expect = ";";} END															{ printpos("loop -> DO code WHILE compare", true); }
 	;
 
 /* If or If else */
@@ -189,7 +189,7 @@ code:	L_BRACE { expect = "middle";} middle { expect = "}";} R_BRACE													
 middle:		/* empty */																																						{ printpos("middle -> epsilon", true); }
 	|	assign { expect = ";";} END { expect = "middle";} middle																											{ printpos("middle -> assign END middle", true); }
 	|	init { expect = ";";} END { expect = "middle";} middle																												{ printpos("middle -> declare END middle", true); }
-	|	loop { expect = ";";} END { expect = "middle";} middle																												{ printpos("middle -> loop END middle", true); }
+	|	loop { expect = "middle";} middle																												{ printpos("middle -> loop END middle", true); }
 	|	case { expect = "middle";} middle																																	{ printpos("middle -> read END middle", true); }
 	|	read { expect = ";";} END { expect = "middle";} middle																												{ printpos("middle -> read END middle", true); }
 	|	write { expect = ";";} END { expect = "middle";} middle																												{ printpos("middle -> write END middle", true); }
