@@ -13,7 +13,7 @@ Compiler Name:  Compilotron <br>
 | Relational operators               	| a>b   a<b   a==b   a!=b                                            	|
 | While and Do-While loops           	| while(_condition_){_code_}<br><br>do{_code_}while(_condition_)     	|
 | If-then-Else statements            	| if(_condition_){_code_}else{_code_}<br><br>if(_condition_){_code_} 	|
-| Read and Write statements          	| read "FileName"<br><br>write "FileName"                            	|
+| Read and Write statements          	| read "User input"<br><br>write "Print to console"                  	|
 | Comments                           	| //_Comment after_                                                  	|
 | Functions                          	| int func(_arguments_){_code_}                                      	|
 
