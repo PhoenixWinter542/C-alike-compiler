@@ -14,7 +14,7 @@ Compiler Name:  Compilotron <br>
 | While and Do-While loops           	| while(_condition_){_code_}<br><br>do{_code_}while(_condition_)     	|
 | If-then-Else statements            	| if(_condition_){_code_}else{_code_}<br><br>if(_condition_){_code_} 	|
 | Read and Write statements          	| read "FileName"<br><br>write "FileName"                            	|
-| Comments                           	| //_Comment after_<br><br>/* _Comment between_ */                   	|
+| Comments                           	| //_Comment after_                                                  	|
 | Functions                          	| int func(_arguments_){_code_}                                      	|
 
 | ** Symbol in Language**             | **Token Name**                                                      |
