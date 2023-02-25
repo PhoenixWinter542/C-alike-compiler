@@ -3,10 +3,12 @@
 int yyerror(char *s);
 int yylex(void);
 void printpos(string tokens, bool nonterm);
+void WriteToMil(string text);
 string expect = "start";
 string txt = "";
 string store = "";
-extern char *yytext;	// defined and maintained in lex.c
+extern char *yytext;    // defined and maintained in lex.c
+FILE *fp = fopen("basic.mil", "w+");
 %}
 
 %union{
@@ -266,6 +268,14 @@ string choosenext(string next){
         return "WRITE";
     else //Terminal is next
         return next;
+}
+
+void WriteToMil(string text)
+{
+    FILE *fp;
+    fp = fopen("basic.mil", "r+");
+    fputs(text.c_str(), fp);
+    fclose(fp);
 }
 
 void printpos(string tokens, bool nonterm)
