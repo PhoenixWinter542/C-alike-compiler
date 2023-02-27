@@ -69,42 +69,42 @@ ALNUM       [a-zA-Z0-9]+
 [\n]		{ yylineno++;	}
 
  /* Comparisons */
-{LESS}		{ yylval.op_val = new std::string(yytext); return LESS; }
-{GREATER}	{ yylval.op_val = new std::string(yytext); return GREATER; }
-{LTE}       { yylval.op_val = new std::string(yytext); return LTE; }
-{GTE}   	{ yylval.op_val = new std::string(yytext); return GTE; }
-{COMPEQUAL}	{ yylval.op_val = new std::string(yytext); return COMPEQUAL; }
-{NOT}   	{ yylval.op_val = new std::string(yytext); return NOT; }
+{LESS}		{ yylval = new std::string(yytext); return LESS; }
+{GREATER}	{ yylval = new std::string(yytext); return GREATER; }
+{LTE}       { yylval = new std::string(yytext); return LTE; }
+{GTE}   	{ yylval = new std::string(yytext); return GTE; }
+{COMPEQUAL}	{ yylval = new std::string(yytext); return COMPEQUAL; }
+{NOT}   	{ yylval = new std::string(yytext); return NOT; }
  /* Math */
-{ADD}		{ yylval.op_val = new std::string(yytext); return ADD; }
-{SUBTRACT}	{ yylval.op_val = new std::string(yytext); return SUBTRACT; }
-{MULTIPLY}	{ yylval.op_val = new std::string(yytext); return MULTIPLY; }
-{DIVIDE}	{ yylval.op_val = new std::string(yytext); return DIVIDE; }
-{DIGIT} 	{ yylval.op_val = new std::string(yytext); return DIGIT; }
+{ADD}		{ yylval = new std::string(yytext); return ADD; }
+{SUBTRACT}	{ yylval = new std::string(yytext); return SUBTRACT; }
+{MULTIPLY}	{ yylval = new std::string(yytext); return MULTIPLY; }
+{DIVIDE}	{ yylval = new std::string(yytext); return DIVIDE; }
+{DIGIT} 	{ yylval = new std::string(yytext); return DIGIT; }
  /* () {} [] */
-{L_PAREN}	{ yylval.op_val = new std::string(yytext); return L_PAREN; }
-{R_PAREN}	{ yylval.op_val = new std::string(yytext); return R_PAREN; }
-{L_BRACK}	{ yylval.op_val = new std::string(yytext); return L_BRACK; }
-{R_BRACK}	{ yylval.op_val = new std::string(yytext); return R_BRACK; }
-{L_BRACE}	{ yylval.op_val = new std::string(yytext); return L_BRACE; }
-{R_BRACE}	{ yylval.op_val = new std::string(yytext); return R_BRACE; }
+{L_PAREN}	{ yylval = new std::string(yytext); return L_PAREN; }
+{R_PAREN}	{ yylval = new std::string(yytext); return R_PAREN; }
+{L_BRACK}	{ yylval = new std::string(yytext); return L_BRACK; }
+{R_BRACK}	{ yylval = new std::string(yytext); return R_BRACK; }
+{L_BRACE}	{ yylval = new std::string(yytext); return L_BRACE; }
+{R_BRACE}	{ yylval = new std::string(yytext); return R_BRACE; }
  /* Symbols */
-{END}		{ yylval.op_val = new std::string(yytext); return END; }
-{SEPARATOR} { yylval.op_val = new std::string(yytext); return SEPARATOR; }
-{EQUAL}	    { yylval.op_val = new std::string(yytext); return EQUAL; }
-{RETURN}	{ yylval.op_val = new std::string(yytext); return RETURN; }
+{END}		{ yylval = new std::string(yytext); return END; }
+{SEPARATOR} { yylval = new std::string(yytext); return SEPARATOR; }
+{EQUAL}	    { yylval = new std::string(yytext); return EQUAL; }
+{RETURN}	{ yylval = new std::string(yytext); return RETURN; }
  /* Conditionals */
-{IF}    	{ yylval.op_val = new std::string(yytext); return IF; }
-{ELSE}	    { yylval.op_val = new std::string(yytext); return ELSE; }
+{IF}    	{ yylval = new std::string(yytext); return IF; }
+{ELSE}	    { yylval = new std::string(yytext); return ELSE; }
  /* Loops */
-{WHILE}	    { yylval.op_val = new std::string(yytext); return WHILE; }
-{DO}	    { yylval.op_val = new std::string(yytext); return DO; }
+{WHILE}	    { yylval = new std::string(yytext); return WHILE; }
+{DO}	    { yylval = new std::string(yytext); return DO; }
  /* Types */
-{INTEGER}	{ yylval.op_val = new std::string(yytext); return INTEGER; }
+{INTEGER}	{ yylval = new std::string(yytext); return INTEGER; }
  /* Storage */
-{READ}  	{ yylval.op_val = new std::string(yytext); return READ; }
-{WRITE}	    { yylval.op_val = new std::string(yytext); return WRITE; }
-{VARIABLE}	{ yylval.op_val = new std::string(yytext); return VARIABLE; }
+{READ}  	{ yylval = new std::string(yytext); return READ; }
+{WRITE}	    { yylval = new std::string(yytext); return WRITE; }
+{VARIABLE}	{ yylval = new std::string(yytext); cout << "HERE: " << *yylval << endl; return VARIABLE; }
 
 
 <<EOF>> { exit(1); }

@@ -16,28 +16,24 @@ extern char *yytext;    // defined and maintained in lex.c
 FILE *fp = fopen("basic.mil", "w+");
 operations* vars = new operations();
 %}
-
-%union{
-	int		int_val;
-	string*	op_val;
-}
+%define api.value.type {string*}
 
 %start	start
 
 /* Comparisons */
-%left <op_val>	LESS
-%left <op_val>	GREATER
-%left <op_val>	LTE
-%left <op_val>	GTE
-%left <op_val>	COMPEQUAL
-%left <op_val>	NOT
+%token	LESS
+%token	GREATER
+%token	LTE
+%token	GTE
+%token	COMPEQUAL
+%token	NOT
 
 /* Math */
-%left <op_val>	ADD
-%left <op_val>	SUBTRACT
-%left <op_val>	MULTIPLY
-%left <op_val>	DIVIDE
-%left <op_val>	DIGIT
+%token	ADD
+%token	SUBTRACT
+%token	MULTIPLY
+%token	DIVIDE
+%token	DIGIT
 
 /* () {} [] */
 %left	L_PAREN
@@ -62,44 +58,48 @@ operations* vars = new operations();
 %left  	DO
 
 /* Storage */
-%left <op_val>	VARIABLE
+%left VARIABLE
 %left	READ
 %left	WRITE
 
 /* Types */
 %left	INTEGER
 
-%type <op_val> function
-%type <op_val> call
-%type <op_val> type
-%type <op_val> varcnst
-%type <op_val> add
-%type <op_val> sub
-%type <op_val> mult
-%type <op_val> div
-%type <op_val> paren
-%type <op_val> array
-%type <op_val> arraydec
-%type <op_val> assign
-%type <op_val> multarg
-%type <op_val> compare
-%type <op_val> declare
-%type <op_val> multdec
-%type <op_val> init
-%type <op_val> initassign
-%type <op_val> loop
-%type <op_val> case
-%type <op_val> elcase
-%type <op_val> relate
-%type <op_val> code
-%type <op_val> middle
-%type <op_val> read
-%type <op_val> write
-
 %%
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Allows one or more functions */
-start:		function multfunc																																				{ vars->clean(); WriteToMil(vars->getMil()); delete vars;}
+start:		function multfunc																																				{ cout << "102" << endl; vars->clean(); WriteToMil(vars->getMil()); delete vars;}
 	;
 
 /* Handles multiple functions */
@@ -108,132 +108,132 @@ multfunc:	/* empty */
 	;
 
 /* Function with body */
-function:	type { expect = "VARIABLE";} VARIABLE { addFunc(*$<op_val>2); expect = "(";} L_PAREN { expect = "declare";} declare { expect = ")";} R_PAREN { expect = "code";} code	{ vars->popScope(); }
+function:	type { expect = "VARIABLE";} VARIABLE { addFunc(*yylval); expect = "(";} L_PAREN { expect = "declare";} declare { expect = ")";} R_PAREN { expect = "code";} code	{ vars->popScope(); }
 	;
 
 /* Variable declarations for function definitions */
-declare:	/* empty */																																						{  }
-	|	type { expect = "varcnst";} varcnst { expect = "multdec"; addVariable(yytext); } multdec																			{  }
+declare:	/* empty */																																							{ cout << "115" << endl;  }
+	|	type { expect = "varcnst";} varcnst { cout << $2 << endl; expect = "multdec"; addVariable(*$2); } multdec																			{ cout << "116" << endl;  }
 	;
 
 /* Handles multiple declarations */
-multdec:	/* empty */																																						{  }
-	|	SEPARATOR { expect = "varcnst";} varcnst {  addVariable(yytext); expect = "multdec";} multdec																		{  }
+multdec:	/* empty */																																						{ cout << "120" << endl;  }
+	|	SEPARATOR { expect = "varcnst";} varcnst {  addVariable(*$2); expect = "multdec";} multdec																		{ cout << "121" << endl;  }
 	;
 
 /* call to a function */
-call:		VARIABLE { expect = "(";} L_PAREN { expect = "add";} add { vars->addParam(*$<op_val>3); expect = "multarg";} multarg { expect = ")";} R_PAREN					{ $$ = callFunc(*$1); }
+call:		VARIABLE { expect = "(";} L_PAREN { expect = "add";} add { vars->addParam(*$3); expect = "multarg";} multarg { expect = ")";} R_PAREN					{ cout << "125" << "\t"; $$ = callFunc(*$1); }
 	;
 
 /* Handles having more than one argument */
-multarg:	/* empty */																																						{  }
-	|	SEPARATOR { expect = "add";} add { expect = "multarg";} multarg																										{ vars->addParam(*$<op_val>2); }
+multarg:	/* empty */																																						{ cout << "129" << endl;  }
+	|	SEPARATOR { expect = "add";} add { expect = "multarg";} multarg																										{ cout << "130" << "\t"; vars->addParam(*$2); }
 	;
 
 /* List of accepted types */
-type:		INTEGER																																							{  }
+type:		INTEGER																																							{ cout << "134" << endl; }
 	;
 
 /* Variables, constants, and things that return constants */
-varcnst:		VARIABLE																																					{ addVariable(*$1); $$ = $1; }
-	|	DIGIT																																								{ $$ = $1; }
-	|	VARIABLE { expect = "array";}  array																																{ addVariable(*$1); $$ = $1; }
-	|	call																																								{ $$ = $1; }
+varcnst:		VARIABLE																																					{ $$ = std::string; cout << "138" << endl; }
+	|	DIGIT																																								{ cout << "139" << endl; $$ = $1; }
+	|	VARIABLE { expect = "array";}  array																																{ cout << "140" << endl; $$ = $1; }
+	|	call																																								{ cout << "141" << endl; $$ = $1; }
 	;
 
 /*------------------- Beginning of math handling, can reduce to just varcnst ------------------------------*/
 
-add:		add { expect = "+"; } ADD { expect = "sub"; } sub																												{ $$ = vars->combo("+", *$1, *$3); }
-	|	sub																																									{ $$ = $1; }
+add:		add { expect = "+"; } ADD { expect = "sub"; } sub																												{ cout << "146" << "\t"; $$ = vars->combo("+", *$1, *$3); }
+	|	sub																																									{ cout << "147" << endl; $$ = $1; }
 	;
 
-sub:		sub { expect = "-"; } SUBTRACT { expect = "mult";} mult																											{ $$ = vars->combo("-", *$1, *$3); }
-	|	mult																																								{ $$ = $1; }
+sub:		sub { expect = "-"; } SUBTRACT { expect = "mult";} mult																											{ cout << "150" << "\t"; $$ = vars->combo("-", *$1, *$3); }
+	|	mult																																								{ cout << "151" << endl; $$ = $1; }
 	;
 
-mult:		mult { expect = "*"; } MULTIPLY { expect = "div"; } div																											{ $$ = vars->combo("*", *$1, *$3); }
-	|	div																																									{ $$ = $1; }
+mult:		mult { expect = "*"; } MULTIPLY { expect = "div"; } div																											{ cout << "154" << "\t"; $$ = vars->combo("*", *$1, *$3); }
+	|	div																																									{ cout << "155" << endl; $$ = $1; }
 	;
 
-div:		div { expect = "/"; } DIVIDE { expect = "paren"; } paren																										{ $$ = vars->combo("/", *$1, *$3); }
-	|	paren																																								{ $$ = $1; }
+div:		div { expect = "/"; } DIVIDE { expect = "paren"; } paren																										{ cout << "158" << endl; $$ = vars->combo("/", *$1, *$3); }
+	|	paren																																								{ cout << "159" << endl; $$ = $1; }
 	;
 
-paren:		L_PAREN { expect = "add"; } add { expect = ")"; } R_PAREN																										{ $$ = $<op_val>2; }
-	|	varcnst																																								{ $$ = $1; }
+paren:		L_PAREN { expect = "add"; } add { expect = ")"; } R_PAREN																										{ cout << "162" << endl; $$ = $2; }
+	|	varcnst																																								{ cout << "163" << endl; $$ = $1; }
 	;
 
 /*------------------------------------------- End of math handling -----------------------------------------*/
 
 /* Definition of allowed array brackets */
-array:		L_BRACK { expect = "add";} add { expect = "]";} R_BRACK																											{ $$ = $<op_val>2; }
+array:		L_BRACK { expect = "add";} add { expect = "]";} R_BRACK																											{ cout << "169" << endl; $$ = $2; }
 	;
 
 /* Array declaration */
-arraydec:	VARIABLE { addVariable(*$1); expect = "array";} array																											{ vars->declare(*$1, *$<op_val>2); $$ = $1; }     /* adding type gives reduce/reduce warning */
+arraydec:	VARIABLE { addVariable(*$1); expect = "array";} array																											{ cout << "173" << "\t"; vars->declare(*$1, *$2); $$ = $1; }     /* adding type gives reduce/reduce warning */
 	;
 
 /* Assigns a value to a variable */
-assign:		VARIABLE {  expect = "=";} EQUAL { expect = "add";} add																											{ vars->copy(*$1, *$<op_val>3); }
+assign:		VARIABLE {  expect = "=";} EQUAL { expect = "add";} add																											{ cout << "177" << "\t"; vars->copy(*$1, *$3); }
 	;
 
 /* Conditional statements (Includes parentheses) */
-compare:	L_PAREN { expect = "add";} add { expect = "relate";} relate { expect = "add";} add { expect = ")";} R_PAREN														{  }
+compare:	L_PAREN { expect = "add";} add { expect = "relate";} relate { expect = "add";} add { expect = ")";} R_PAREN														{ cout << "181" << endl;  }
 	;
 
 /* Declaration of local variables */
-init:		type { expect = "VARIABLE"; } VARIABLE {  addVariable(*$<op_val>2); expect = "initassign"; } initassign															{ if($<op_val>3){vars->copy(*$<op_val>2, *$<op_val>3);}; $$ = $<op_val>2; }
+init:		type { expect = "VARIABLE"; } VARIABLE {  addVariable(*$2); expect = "initassign"; } initassign															{ cout << "185" << "\t"; if($3){vars->copy(*$2, *$3);}; $$ = $2; }
 	;
 
-initassign:	/* empty */																																						{ $$ = NULL; }
-	|	EQUAL { expect = "add"; } add																																		{ $$ = $<op_val>2; }
+initassign:	/* empty */																																						{ cout << "188" << endl; $$ = NULL; }
+	|	EQUAL { expect = "add"; } add																																		{ cout << "189" << endl; $$ = $2; }
 	;
 
 /* Currently handles "do while" and "while" loops */
-loop:		WHILE { expect = "compare";} compare { expect = "code";} code																									{  }
-	|	DO { expect = "code";} code { expect = "while";} WHILE { expect = "compare";} compare { expect = ";";} END															{  }
+loop:		WHILE { expect = "compare";} compare { expect = "code";} code																									{ cout << "193" << endl;  }
+	|	DO { expect = "code";} code { expect = "while";} WHILE { expect = "compare";} compare { expect = ";";} END															{ cout << "194" << endl;  }
 	;
 
 /* If or If else */
-case:	IF { expect = "compare";} compare { expect = "code";} code { expect = "elcase";} elcase																				{  }
+case:	IF { expect = "compare";} compare { expect = "code";} code { expect = "elcase";} elcase																				{ cout << "198" << endl;  }
 	;
 
 /* handles any else that may occur */
-elcase:		/* empty */																																						{  }
-	|	ELSE { expect = "code";} code																																		{  }
+elcase:		/* empty */																																						{ cout << "202" << endl;  }
+	|	ELSE { expect = "code";} code																																		{ cout << "203" << endl;  }
 	;
 
 /* List of accepted comparison operators */
-relate:		LESS																																							{ $$ = $1; }
-	|	GREATER																																								{ $$ = $1; }
-	|	LTE																																									{ $$ = $1; }
-	|	GTE																																									{ $$ = $1; }
-	|	COMPEQUAL																																							{ $$ = $1; }
-	|	NOT EQUAL																																							{ $$ = $1; }
+relate:		LESS																																							{ cout << "207" << endl; $$ = $1; }
+	|	GREATER																																								{ cout << "208" << endl; $$ = $1; }
+	|	LTE																																									{ cout << "209" << endl; $$ = $1; }
+	|	GTE																																									{ cout << "210" << endl; $$ = $1; }
+	|	COMPEQUAL																																							{ cout << "211" << endl; $$ = $1; }
+	|	NOT EQUAL																																							{ cout << "212" << endl; $$ = $1; }
 	;
 
 /* Enforces the braces around a code block */
-code:	L_BRACE { expect = "middle";} middle { expect = "}";} R_BRACE																										{  }
+code:	L_BRACE { expect = "middle";} middle { expect = "}";} R_BRACE																										{ cout << "216" << endl;  }
 	;
 
 /* List of all things that can be in a code block */
-middle:		/* empty */																																						{  }
-	|	assign { expect = ";";} END { expect = "middle";} middle																											{  }
-	|	init { expect = ";";} END { expect = "middle";} middle																												{  }
-	|	loop { expect = "middle";} middle																																	{  }
-	|	case { expect = "middle";} middle																																	{  }
-	|	read { expect = ";";} END { expect = "middle";} middle																												{  }
-	|	write { expect = ";";} END { expect = "middle";} middle																												{  }
-	|	arraydec { expect = ";";} END { expect = "middle";} middle																											{  }
-	|	RETURN { expect = "add";} add { vars->retFunc(yytext); expect = ";";} END { expect = "middle";} middle																{  }
+middle:		/* empty */																																						{ cout << "220" << endl;  }
+	|	assign { expect = ";";} END { expect = "middle";} middle																											{ cout << "221" << endl;  }
+	|	init { expect = ";";} END { expect = "middle";} middle																												{ cout << "222" << endl;  }
+	|	loop { expect = "middle";} middle																																	{ cout << "223" << endl;  }
+	|	case { expect = "middle";} middle																																	{ cout << "224" << endl;  }
+	|	read { expect = ";";} END { expect = "middle";} middle																												{ cout << "225" << endl;  }
+	|	write { expect = ";";} END { expect = "middle";} middle																												{ cout << "226" << endl;  }
+	|	arraydec { expect = ";";} END { expect = "middle";} middle																											{ cout << "227" << endl;  }
+	|	RETURN { expect = "add";} add { vars->retFunc(yytext); expect = ";";} END { expect = "middle";} middle																{ cout << "228" << endl;  }
 	;
 
 /* Read user input */
-read:	READ { expect = "VARIABLE"; } VARIABLE																																{ vars->read(*$<op_val>2); }
+read:	READ { expect = "VARIABLE"; } VARIABLE																																{ cout << "232" << "\t"; vars->read(*$2); }
 	;
 
 /* Output to console */
-write:	WRITE { expect = "VARIABLE"; } VARIABLE																																{ vars->write(*$<op_val>2); }
+write:	WRITE { expect = "VARIABLE"; } VARIABLE																																{ cout << "236" << "\t"; vars->write(*$2); }
 	;
 
 %%
@@ -329,6 +329,7 @@ void addGlobal(string name, bool assign){
 }
 
 void addFunc(string name){
+	cout << "addFunc " << name << endl;
 	if(false == vars->addFunc(name)){
 		semerror("\"" + name + "\" re-declaration");
 	}
@@ -345,7 +346,8 @@ string* callFunc(string name){
 int semerror(string s){
 	extern int yylineno;
 
-	cerr << "SEMANTIC ERROR: \"" << s << "\" on line " << yylineno << endl;
+	cerr << "SEMANTIC ERROR: " << s << " on line " << yylineno << endl;
+	cout << endl << vars->getMil() << endl;
 	delete vars;
 	exit(1);
 }
