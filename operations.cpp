@@ -1,4 +1,6 @@
 #include "variables.cpp"
+#include <string>
+using namespace std;
 
 class operations{
 	private:
@@ -8,6 +10,7 @@ class operations{
 		string mil;
 		int tmpCount;
 		vector<string> curFunc;	
+		vector<string> allFunc;
 		vector<string*> garbageTmp;
 
 		void assigned(string name);
@@ -57,6 +60,8 @@ class operations{
 bool operations::addFunc(string name){
 	newScope();
 	curFunc[scope] = name;
+	allFunc.push_back(name);
+	addLine("func " + name);
 	return addGlobal(name, true);
 }
 
@@ -81,8 +86,8 @@ void operations::clean(){
 }
 
 bool operations::funcDeclared(string name){
-	for(int i = 0; i <= scope; i++){
-		if(name == curFunc[i])
+	for(unsigned int i = 0; i < allFunc.size(); i++){
+		if(name == allFunc[i])
 			return true;
 	}
 	return false;

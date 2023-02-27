@@ -104,7 +104,7 @@ ALNUM       [a-zA-Z0-9]+
  /* Storage */
 {READ}  	{ yylval = new std::string(yytext); return READ; }
 {WRITE}	    { yylval = new std::string(yytext); return WRITE; }
-{VARIABLE}	{ yylval = new std::string(yytext); cout << "HERE: " << *yylval << endl; return VARIABLE; }
+{VARIABLE}	{ yylval = new std::string(yytext); return VARIABLE; }
 
 
 <<EOF>> { exit(1); }
