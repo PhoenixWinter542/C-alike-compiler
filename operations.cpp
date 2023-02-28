@@ -152,7 +152,6 @@ bool operations::addGlobal(string name, bool assigned){
 
 void operations::addLine(string line){
 	mil += line + "\n";
-	cout << line + "\n";
 }
 
 void operations::beginFunc(string name){
