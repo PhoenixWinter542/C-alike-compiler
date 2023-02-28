@@ -9,6 +9,7 @@ class operations{
 		int scope;
 		string mil;
 		int tmpCount;
+		vector<int> storeTmpCount;
 		vector<string> curFunc;	
 		vector<string> allFunc;
 		vector<string*> garbageTmp;
@@ -92,6 +93,7 @@ bool operations::funcDeclared(string name){
 void operations::newScope(){
 	variables* tmp = new variables(global.getStruct());
 	local.push_back(tmp);
+	storeTmpCount.push_back(tmpCount);
 	scope++;
 	curFunc.push_back("");
 }
@@ -105,6 +107,8 @@ void operations::popScope(){
 		}
 		curFunc.pop_back();
 		scope--;
+		tmpCount = storeTmpCount.back();
+		storeTmpCount.pop_back();
 	}
 }
 
