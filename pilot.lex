@@ -107,7 +107,7 @@ ALNUM       [a-zA-Z0-9]+
 {VARIABLE}	{ yylval = new std::string(yytext); return VARIABLE; }
 
 
-<<EOF>> { exit(1); }
+<<EOF>> { return FILEEND; }
 
 .		{ std::cerr << "SCANNER "; yyerror("Unrecognized character"); exit(1);	}
 

@@ -21,6 +21,8 @@ operations* vars = new operations();
 
 %start	start
 
+%token FILEEND
+
 /* Comparisons */
 %token	LESS
 %token	GREATER
@@ -70,12 +72,12 @@ operations* vars = new operations();
 %%
 
 /* Allows one or more functions */
-start:		function multfunc																																				{ $start = $function; WriteToMil(vars->getMil()); delete vars;}
+start:		function multfunc																																				{ $start = $function; WriteToMil(vars->getMil()); delete vars; exit(1);}
 	;
 
 /* Handles multiple functions */
-multfunc:	/* empty */		{ }
-	|	function { WriteToMil(vars->getMil()); } multfunc	{ $$ = $function;}
+multfunc:	FILEEND		{  }
+	|	function multfunc	{ $$ = $function;}
 	;
 
 /* Function with body */
@@ -84,7 +86,7 @@ function:	type { expect = "VARIABLE";} VARIABLE { addFunc(*$VARIABLE); expect = 
 
 /* Variable declarations for function definitions */
 declare:	/* empty */																																							{  }
-	|	type { expect = "VARIABLE";} VARIABLE { expect = "multdec"; addArg(*$VARIABLE); } multdec																				{  }
+	|	type { expect = "VARIABLE";} VARIABLE { expect = "multdec"; addArg(*$VARIABLE); } multdec
 	;
 
 /* Handles multiple declarations */
