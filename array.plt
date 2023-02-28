@@ -1,5 +1,5 @@
 int main(){
-	int a[20];
+	int[20] a;
 	int b = 3;
 	int c = 5;
 	a[0] = b + c;

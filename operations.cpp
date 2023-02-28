@@ -12,6 +12,7 @@ class operations{
 		vector<string> curFunc;	
 		vector<string> allFunc;
 		vector<string*> garbageTmp;
+		int argPos;
 
 		void assigned(string name);
 		void addLine(string line);
@@ -30,8 +31,6 @@ class operations{
 		bool addGlobal(string name, bool assigned);
 		bool addFunc(string name);
 
-		void clean();
-
 		//Mil Functions
 		void addParam(string name);
 		string* callFunc(string name);
@@ -40,7 +39,7 @@ class operations{
 		void declare(string name, string size);
 		void copy(string dst, string src);
 		void copy(string dst);
-		void arrToVar(string dst, string src, string index);
+		string* arrToVar(string src, string index);
 		void varToArr(string dst, string index, string src);
 		void read(string dst);
 		void read(string dst, string index);
@@ -55,6 +54,9 @@ class operations{
 
 		//Constructors
 		operations();
+
+		//Deconstrucor
+		~operations();
 };
 
 bool operations::addFunc(string name){
@@ -75,14 +77,8 @@ string operations::toString(int val){
 string* operations::getTmp(){
 	string* tmp = new string("_tmp" + toString(tmpCount++));
 	garbageTmp.push_back(tmp);
+	declare(*tmp);
 	return tmp;
-}
-
-void operations::clean(){
-	while(false == garbageTmp.empty()){
-		delete garbageTmp.back();
-		garbageTmp.pop_back();
-	}
 }
 
 bool operations::funcDeclared(string name){
@@ -116,6 +112,18 @@ operations::operations(){
 	scope = -1;
 	mil = "";
 	tmpCount = 0;
+	argPos = 0;
+}
+
+operations::~operations(){
+	while(false == garbageTmp.empty()){
+		delete garbageTmp.back();
+		garbageTmp.pop_back();
+	}
+	while(false == local.empty()){
+		delete local.back();
+		local.pop_back();
+	}
 }
 
 void operations::assigned(string name){
@@ -151,7 +159,8 @@ void operations::beginFunc(string name){
 	addLine("func " + name);
 }
 void operations::endFunc(){
-	addLine("endfunc");
+	addLine("endfunc\n");
+	argPos = 0;
 }
 void operations::addParam(string name){
 	addLine("param " + name);
@@ -180,13 +189,15 @@ void operations::declare(string name, string size){
 void operations::copy(string dst, string src){
 	addLine("= " + dst + ", " + src);
 }
-//No idea what this is for		= dst, $0		 	dst = $0 ($0 is the 1st function parameter) 
+//Declares parameter values		= dst, $0		 	dst = $0 ($0 is the 1st function parameter) 
 void operations::copy(string dst){
-	addLine("= " + dst + ", " + "$0");
+	addLine("= " + dst + ", " + "$" + toString(argPos++));
 }
 //dst = src[index]
-void operations::arrToVar(string dst, string src, string index){
-	addLine("=[] " + dst + ", " + src + ", " + index);
+string* operations::arrToVar(string src, string index){
+	string* tmp = getTmp();
+	addLine("=[] " + *tmp + ", " + src + ", " + index);
+	return tmp;
 }
 //dst[index] = src
 void operations::varToArr(string dst, string index, string src){
