@@ -8,6 +8,8 @@ int fibonacci(int k){
 }
 
 int newFunc(int n) {
+	int[20] a;
+	int x = a;
     while (n != 10) {
         n = n + 1;
     }

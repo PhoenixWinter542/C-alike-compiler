@@ -1,6 +1,7 @@
 #include "variables.cpp"
 #include <string>
 using namespace std;
+int semerror(string s);
 
 class operations{
 	private:
@@ -22,15 +23,18 @@ class operations{
 		string toString(int val);
 		string* getTmp();
 		bool funcDeclared(string name);
+		void redeclare(string name){semerror("\""+ name + "\" re-declaration");};
 
 	public:
 		void newScope();
 		void popScope();
-		bool addVariable(string name, bool assigned){return local[scope]->addVariable(name, assigned);};
+		void addVariable(string name){addVariable(name, false);};
+		void addVariable(string name, bool assigned);
 		
-		bool addGlobal(string name);
-		bool addGlobal(string name, bool assigned);
-		bool addFunc(string name);
+		void addGlobal(string name){addGlobal(name, false);};
+		void addGlobal(string name, bool assigned);
+		void addFunc(string name);
+		void addArg(string name){addVariable(name); copy(name);};
 
 		//Mil Functions
 		void addParam(string name);
@@ -60,12 +64,17 @@ class operations{
 		~operations();
 };
 
-bool operations::addFunc(string name){
+void operations::addVariable(string name, bool assigned){
+	if( false == local[scope]->addVariable(name, assigned))
+		redeclare(name);
+}
+
+void operations::addFunc(string name){
 	newScope();
 	curFunc[scope] = name;
 	allFunc.push_back(name);
 	addLine("func " + name);
-	return addGlobal(name, true);
+	addGlobal(name, true);
 }
 
 //Converts up to 32 bit ints into strings
@@ -135,14 +144,15 @@ void operations::assigned(string name){
 	local[scope]->assigned(name);
 }
 
-bool operations::addGlobal(string name, bool assigned){
+void operations::addGlobal(string name, bool assigned){
 	if(true == global.addVariable(name, assigned)){
 		for(int i = 0; i <= scope; i++){
 			if(false == local[i]->addVariable(name, assigned))		//Adds global to all scopes, returns false if global name was already used in a scope
-				return false;
+				redeclare(name);
 		}
 	}
-	return true;
+	else
+		redeclare(name);
 }
 
 
@@ -175,7 +185,8 @@ string* operations::callFunc(string name){
 		return tmp;
 	}
 	else
-		return NULL;
+		semerror("undeclared function \"" + name + "\"");
+	return NULL;	//Should never get here
 }
 void operations::retFunc(string ret){
 	addLine("ret " + ret);

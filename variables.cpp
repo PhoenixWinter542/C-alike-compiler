@@ -41,8 +41,9 @@ void variables::push(string newName, bool assigned){
 
 int variables::findPos(string name){
 	for(unsigned int i = 0; i < varNames.size(); i++){
-		if(varNames[i].name == name)
+		if(varNames[i].name == name){
 			return i;
+		}
 	}
 	return -1;
 }

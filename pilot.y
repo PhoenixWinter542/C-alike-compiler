@@ -5,13 +5,6 @@ int yyerror(char *s);
 int yylex(void);
 int semerror(string s);
 void WriteToMil(string text);
-void addArg(string name);
-void addVariable(string name);
-void addVariable(string name, bool assign);
-void addGlobal(string name);
-void addGlobal(string name, bool assign);
-void addFunc(string name);
-string* callFunc(string name);
 string expect = "start";
 extern char *yytext;    // defined and maintained in lex.c
 FILE *fp = fopen("basic.mil", "w+");
@@ -81,21 +74,21 @@ multfunc:	FILEEND		{  }
 	;
 
 /* Function with body */
-function:	type { expect = "VARIABLE";} VARIABLE { addFunc(*$VARIABLE); expect = "(";} L_PAREN { expect = "declare";} declare { expect = ")";} R_PAREN { expect = "code";} code	{ vars->popScope(); WriteToMil(vars->getMil()); $function = $type; }
+function:	type { expect = "VARIABLE";} VARIABLE { vars->addFunc(*$VARIABLE); expect = "(";} L_PAREN { expect = "declare";} declare { expect = ")";} R_PAREN { expect = "code";} code	{ vars->popScope(); WriteToMil(vars->getMil()); $function = $type; }
 	;
 
 /* Variable declarations for function definitions */
 declare:	/* empty */																																							{  }
-	|	type { expect = "VARIABLE";} VARIABLE { expect = "multdec"; addArg(*$VARIABLE); } multdec
+	|	type { expect = "VARIABLE";} VARIABLE { expect = "multdec"; vars->addArg(*$VARIABLE); } multdec
 	;
 
 /* Handles multiple declarations */
 multdec:	/* empty */																																						{  }
-	|	SEPARATOR { expect = "type"; } type { expect = "VARIABLE";} VARIABLE {  addArg(*$VARIABLE); expect = "multdec";} multdec																		{  }
+	|	SEPARATOR { expect = "type"; } type { expect = "VARIABLE";} VARIABLE {  vars->addArg(*$VARIABLE); expect = "multdec";} multdec																		{  }
 	;
 
 /* call to a function */
-call:		VARIABLE { expect = "(";} L_PAREN { expect = "add";} add { vars->addParam(*$add); expect = "multarg";} multarg { expect = ")";} R_PAREN					{ $call = callFunc(*$VARIABLE); }
+call:		VARIABLE { expect = "(";} L_PAREN { expect = "add";} add { vars->addParam(*$add); expect = "multarg";} multarg { expect = ")";} R_PAREN					{ $call = vars->callFunc(*$VARIABLE); }
 	;
 
 /* Handles having more than one argument */
@@ -156,7 +149,7 @@ compare:	L_PAREN { expect = "add";} add { expect = "relate";} relate { expect = 
 	;
 
 /* Declaration of local variables */
-init:		type { expect = "VARIABLE"; } VARIABLE {  addVariable(*$VARIABLE); expect = "initassign"; } initassign															{ if($initassign){vars->copy(*$VARIABLE, *$initassign);}; $init = $VARIABLE; }
+init:		type { expect = "VARIABLE"; } VARIABLE {  vars->addVariable(*$VARIABLE); expect = "initassign"; } initassign													{ if($initassign){vars->copy(*$VARIABLE, *$initassign);}; $init = $VARIABLE; }
 	;
 
 initassign:	/* empty */																																						{ $initassign = NULL; }
@@ -273,52 +266,20 @@ string choosenext(string next){
         return next;
 }
 
+/*
+TODO:
+	using var as array
+	using array as var
+	using undeclared variable
+	using undeclared array
+*/
+
 void WriteToMil(string text)
 {
     FILE *fp;
     fp = fopen("basic.mil", "r+");
     fputs(text.c_str(), fp);
     fclose(fp);
-}
-
-void addArg(string name){
-	addVariable(name);
-	vars->copy(name);
-}
-
-void addVariable(string name){
-	addVariable(name, false);
-}
-
-void addVariable(string name, bool assign){
-	if(false == vars->addVariable(name, assign)){
-		semerror("\"" + name + "\" re-declaration");
-	}
-	vars->declare(name);
-}
-
-void addGlobal(string name){
-	addGlobal(name, false);
-}
-
-void addGlobal(string name, bool assign){
-	if(false == vars->addGlobal(name, assign)){
-		semerror("\"" + name + "\" re-declaration");
-	}
-}
-
-void addFunc(string name){
-	if(false == vars->addFunc(name)){
-		semerror("\"" + name + "\" re-declaration");
-	}
-}
-
-string* callFunc(string name){
-	string* tmp = vars->callFunc(name);
-	if(!tmp){
-		semerror("undeclared function \"" + name + "\"");
-	}
-	return tmp;
 }
 
 int semerror(string s){
