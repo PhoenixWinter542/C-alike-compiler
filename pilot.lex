@@ -22,7 +22,7 @@ SUBTRACT    "-"
 MULTIPLY    "\*"
 DIVIDE      "/"
 MOD         "%"
-DIGIT     [0-9]+
+DIGIT     "-"?[0-9]+
 
 /* () {} [] */
 L_PAREN     \(

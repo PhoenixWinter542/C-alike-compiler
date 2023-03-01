@@ -1,4 +1,4 @@
 int main(){
 	int a = 150;
-	write a;
+	int a = 150;
 }

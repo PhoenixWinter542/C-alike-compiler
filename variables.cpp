@@ -140,7 +140,7 @@ bool variables::outOfBounds(string name, string index){
 	int pos = findPos(name);
 	int tmp = atoi(index);
 	if(-1 != pos){
-		if(0 > tmp || varNames[pos].array.size() <= tmp)
+		if('-' == index[0] || varNames[pos].array.size() <= tmp)
 			return true;
 		else
 			return false;

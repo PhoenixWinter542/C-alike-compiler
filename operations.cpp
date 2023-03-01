@@ -35,6 +35,7 @@ class operations{
 		void segfault(string name, string index){semerror("Memory access violation from \""+ name + "[" + index + "]\"");};//
 		void noMain(){semerror("No main function found");};//
 		void mainArg(){semerror("main function cannot take arguments");};//
+		void negArrSize(string name, string index){semerror("Invalid array size \""+ name + "[" + index + "]\"");};
 
 	public:
 		void newScope();
@@ -78,6 +79,9 @@ class operations{
 };
 
 void operations::addVariable(string name, bool assigned, string array){
+	if("" != array)
+		if('-' == array[0])
+			negArrSize(name, array);
 	if( false == local[scope]->addVariable(name, assigned, array))
 		redeclare(name);
 	if("" == array)
@@ -191,7 +195,7 @@ void operations::addGlobal(string name, bool assigned, string array){
 			mainArg();
 		addVariable(name, false, array);
 		copy(name);
-	};
+	}
 
 
 
@@ -241,6 +245,8 @@ void operations::copy(string dst, string src){
 			arrAsVar(dst);
 		if(local[scope]->isArray(src))
 			arrAsVar(src);
+		if('-' == src[0])
+			src = *combo("0", src.substr(1), "-");
 		if('_' == src[0] || isdigit(src[0]) || true == local[scope]->isAssigned(src)){		//strings starting with _ are assigned when created, strings starting with digit are constants
 			addLine("= " + dst + ", " + src);
 			assigned(dst);
@@ -332,7 +338,7 @@ void operations::go(string label, string predicate){
 	addLine("?:= " + label + ", " + predicate);
 }
 string operations::getMil(){
-	for(int i = 0; i < allFunc.size(); i++){
+	for(unsigned int i = 0; i < allFunc.size(); i++){
 		if("main" == allFunc[i])
 			return mil;
 	}
