@@ -70,7 +70,7 @@ start:		function multfunc																																				{ $start = $functio
 	;
 
 /* Handles multiple functions */
-multfunc:	FILEEND		{  }
+multfunc:	FILEEND
 	|	function multfunc	{ $$ = $function;}
 	;
 
@@ -79,14 +79,19 @@ function:	type { expect = "VARIABLE";} VARIABLE { vars->addFunc(*$VARIABLE); exp
 	;
 
 /* Variable declarations for function definitions */
-declare:	/* empty */																																							{  }
+declare:	/* empty */
 	|	type { expect = "VARIABLE";} VARIABLE { expect = "multdec"; vars->addArg(*$VARIABLE); } multdec
+	|	type { expect = "array";} array {expect = "VARIABLE"; } VARIABLE { expect = "multdec"; vars->addArg(*$VARIABLE, *$array); } multdec
 	;
 
 /* Handles multiple declarations */
-multdec:	/* empty */																																						{  }
-	|	SEPARATOR { expect = "type"; } type { expect = "VARIABLE";} VARIABLE {  vars->addArg(*$VARIABLE); expect = "multdec";} multdec																		{  }
+multdec:	/* empty */
+	|	SEPARATOR { expect = "type"; } type { expect = "vararraydec";} vararraydec
 	;
+
+/* allows args to be variables or arrays */
+vararraydec:		VARIABLE {  vars->addArg(*$VARIABLE); expect = "multdec";} multdec
+	| array {expect = "VARIABLE"; } VARIABLE { expect = "multdec"; vars->addArg(*$VARIABLE, *$array); } multdec
 
 /* call to a function */
 call:		VARIABLE { expect = "(";} L_PAREN { expect = "add";} add { vars->addParam(*$add); expect = "multarg";} multarg { expect = ")";} R_PAREN					{ $call = vars->callFunc(*$VARIABLE); }
@@ -244,6 +249,8 @@ string choosenext(string next){
         return "INTEGER, )";
     else if("multdec" == next)
         return "), ','";
+	else if("vararraydec" == next)
+		return "VARIABLE, [";
     else if("init" == next)
         return "INTEGER";
 	else if ("initassign" == next)
@@ -291,13 +298,11 @@ int yyerror(string s)
 	cerr << "ERROR: "  << " at symbol \"" << yytext;
 	cerr << "\" on line " << yylineno << endl;
 	cout << "EXPECTED: " << "\"" + choosenext(expect) + "\"" << endl;
-	delete vars;
 	exit(1);
 }
 
 int yyerror(char *s)
 {
-	delete vars;
 	return yyerror(string(s));
 }
 
