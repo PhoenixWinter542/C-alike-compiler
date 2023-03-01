@@ -31,6 +31,7 @@ Compiler Name:  Compilotron <br>
 | -                                   | SUBTRACT                                                            |
 | *                                   | MULTIPLY                                                            |
 | /                                   | DIVIDE                                                              |
+| %                                   | MOD                                                                 |
 | while                               | WHILE                                                               |
 | (                                   | L_PARENTH                                                           |
 | )                                   | R_PARENTH                                                           |

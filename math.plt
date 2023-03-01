@@ -17,4 +17,8 @@ int main(){
 	// Division, answer is 2, since 2 = 100/50
 	c = a / b;
 	write c;
+
+	// Modulus, answer is 0, since 0 = 100 % 50
+	c = a % b;
+	write c;
 }

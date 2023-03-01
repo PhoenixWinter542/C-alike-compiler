@@ -29,6 +29,7 @@ operations* vars = new operations();
 %token	SUBTRACT
 %token	MULTIPLY
 %token	DIVIDE
+%token	MOD
 %token	DIGIT
 
 /* () {} [] */
@@ -122,6 +123,7 @@ mult:		mult { expect = "*"; } MULTIPLY { expect = "div"; } div																		
 	;
 
 div:		div { expect = "/"; } DIVIDE { expect = "paren"; } paren																										{ $$ = vars->combo(*$1, *$paren, "/"); }
+	|		div { expect = "%"; } MOD { expect = "paren"; } paren																											{ $$ = vars->combo(*$1, *$paren, "%"); }
 	|	paren																																								{ $$ = $paren; }
 	;
 

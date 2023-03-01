@@ -21,6 +21,7 @@ ADD         "+"
 SUBTRACT    "-"
 MULTIPLY    "\*"
 DIVIDE      "/"
+MOD         "%"
 DIGIT     [0-9]+
 
 /* () {} [] */
@@ -80,6 +81,7 @@ ALNUM       [a-zA-Z0-9]+
 {SUBTRACT}	{ yylval = new std::string(yytext); return SUBTRACT; }
 {MULTIPLY}	{ yylval = new std::string(yytext); return MULTIPLY; }
 {DIVIDE}	{ yylval = new std::string(yytext); return DIVIDE; }
+{MOD}	    { yylval = new std::string(yytext); return MOD; }
 {DIGIT} 	{ yylval = new std::string(yytext); return DIGIT; }
  /* () {} [] */
 {L_PAREN}	{ yylval = new std::string(yytext); return L_PAREN; }

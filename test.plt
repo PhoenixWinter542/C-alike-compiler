@@ -9,7 +9,9 @@ int fibonacci(int k){
 
 int newFunc(int n) {
 	int[20] a;
-	a[0] = 5;
+    int x; 
+    x = 10;
+	a[0] = x;
 	a[1] = a[0];
     while (n != 10) {
         n = n + 1;
