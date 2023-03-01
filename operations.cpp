@@ -16,25 +16,36 @@ class operations{
 		vector<string*> garbageTmp;
 		int argPos;
 
-		void assigned(string name);
 		void addLine(string line);
 		void beginFunc(string name);
 		void endFunc();
 		string toString(int val);
 		string* getTmp();
 		bool funcDeclared(string name);
-		void redeclare(string name){semerror("\""+ name + "\" re-declaration");};
+		void assigned(string name);
+		void assigned(string name, string index);
+
+		//Semantic handling
+		void redeclare(string name){semerror("\""+ name + "\" re-declaration");};//
+		void varAsArr(string name){semerror("Variable \""+ name + "\" used as array");};//
+		void arrAsVar(string name){semerror("Array \""+ name + "\" used as variable");};//
+		void undeclared(string name){semerror("Use of undeclared variable \""+ name + "\"");};//
+		void unassigned(string name){semerror("Use of unassigned variable \""+ name + "\"");};//
+		void unassigned(string name, string index){semerror("Use of unassigned variable \""+ name + "[" + index + "]\"");};//
+		void segfault(string name, string index){semerror("Memory access violation from \""+ name + "[" + index + "]\"");};//
 
 	public:
 		void newScope();
 		void popScope();
-		void addVariable(string name){addVariable(name, false);};
-		void addVariable(string name, bool assigned);
+		void addVariable(string name){addVariable(name, false, "");};
+		void addVariable(string name, string array){addVariable(name, false, array);}
+		void addVariable(string name, bool assigned, string array);
 		
-		void addGlobal(string name){addGlobal(name, false);};
-		void addGlobal(string name, bool assigned);
+		void addGlobal(string name){addGlobal(name, false, "");};
+		void addGlobal(string name, bool assigned, string array);
 		void addFunc(string name);
-		void addArg(string name){addVariable(name); copy(name);};
+		void addArg(string name){addArg(name, "");};
+		void addArg(string name, string array){addVariable(name, false, array); copy(name);};
 
 		//Mil Functions
 		void addParam(string name);
@@ -64,9 +75,13 @@ class operations{
 		~operations();
 };
 
-void operations::addVariable(string name, bool assigned){
-	if( false == local[scope]->addVariable(name, assigned))
+void operations::addVariable(string name, bool assigned, string array){
+	if( false == local[scope]->addVariable(name, assigned, array))
 		redeclare(name);
+	if("" == array)
+		declare(name);
+	else
+		declare(name, array);
 }
 
 void operations::addFunc(string name){
@@ -74,7 +89,7 @@ void operations::addFunc(string name){
 	curFunc[scope] = name;
 	allFunc.push_back(name);
 	addLine("func " + name);
-	addGlobal(name, true);
+	addGlobal(name, true, "");
 }
 
 //Converts up to 32 bit ints into strings
@@ -140,14 +155,27 @@ operations::~operations(){
 }
 
 void operations::assigned(string name){
-	global.assigned(name);
 	local[scope]->assigned(name);
+	if(true == global.assigned(name)){		//Set global to assigned for all scopes
+		for(int i = 0; i < scope; i++){
+			local[scope]->assigned(name);
+		}
+	}
 }
 
-void operations::addGlobal(string name, bool assigned){
-	if(true == global.addVariable(name, assigned)){
+void operations::assigned(string name, string index){
+	local[scope]->assigned(name, index);
+	if(true == global.assigned(name, index)){		//Set global to assigned for all scopes
+		for(int i = 0; i < scope; i++){
+			local[scope]->assigned(name);
+		}
+	}
+}
+
+void operations::addGlobal(string name, bool assigned, string array){
+	if(true == global.addVariable(name, assigned, array)){
 		for(int i = 0; i <= scope; i++){
-			if(false == local[i]->addVariable(name, assigned))		//Adds global to all scopes, returns false if global name was already used in a scope
+			if(false == local[i]->addVariable(name, assigned, array))		//Adds global to all scopes, returns false if global name was already used in a scope
 				redeclare(name);
 		}
 	}
@@ -201,21 +229,63 @@ void operations::declare(string name, string size){
 }
 //dst = src
 void operations::copy(string dst, string src){
-	addLine("= " + dst + ", " + src);
+	if(local[scope]->isUsed(dst)){
+		if(local[scope]->isArray(dst))
+			arrAsVar(dst);
+		if(local[scope]->isArray(src))
+			arrAsVar(src);
+		if('_' == src[0] || isdigit(src[0]) || true == local[scope]->isAssigned(src)){		//strings starting with _ are assigned when created, strings starting with digit are constants
+			addLine("= " + dst + ", " + src);
+			assigned(dst);
+		}
+		else
+			unassigned(src);
+	}
+	else
+		undeclared(dst);
 }
 //Declares parameter values		= dst, $0		 	dst = $0 ($0 is the 1st function parameter) 
 void operations::copy(string dst){
-	addLine("= " + dst + ", " + "$" + toString(argPos++));
+	if(local[scope]->isUsed(dst))	//Shouldn't be neccessary considering addArg is the only path here
+		addLine("= " + dst + ", " + "$" + toString(argPos++));
+	else
+		undeclared(dst);
 }
 //dst = src[index]
 string* operations::arrToVar(string src, string index){
-	string* tmp = getTmp();
-	addLine("=[] " + *tmp + ", " + src + ", " + index);
-	return tmp;
+	if(true == local[scope]->isArray(src)){
+		if(false == local[scope]->outOfBounds(src, index)){
+			if(true == local[scope]->isAssigned(src, index)){
+				string* tmp = getTmp();
+				addLine("=[] " + *tmp + ", " + src + ", " + index);
+				return tmp;
+			}
+			else
+				unassigned(src, index);
+		}
+		else
+			segfault(src, index);
+	}
+	varAsArr(src);
+	return NULL;	//Should never get here
 }
 //dst[index] = src
 void operations::varToArr(string dst, string index, string src){
-	addLine("[]= " + dst + ", " + index + ", " + src);
+	if(true == local[scope]->isArray(dst)){
+		if(false == local[scope]->isArray(src)){
+			if(false == local[scope]->outOfBounds(dst, index)){
+				addLine("[]= " + dst + ", " + index + ", " + src);
+				assigned(dst, index);
+			}
+			else{
+				segfault(dst, index);
+			}
+		}
+		else
+			arrAsVar(src);
+	}
+	else
+		varAsArr(dst);
 }
 //Sets variable to input
 void operations::read(string dst){

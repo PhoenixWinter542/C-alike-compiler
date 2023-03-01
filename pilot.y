@@ -136,11 +136,11 @@ array:		L_BRACK { expect = "add";} add { expect = "]";} R_BRACK																	
 	;
 
 /* Array declaration */
-arraydec:	type array VARIABLE { expect = "array";}																														{ vars->declare(*$VARIABLE, *$array); $arraydec = $VARIABLE; }     /* adding type gives reduce/reduce warning */
+arraydec:	type array VARIABLE { expect = "array";}																														{ vars->addVariable(*$VARIABLE, *$array); $arraydec = $VARIABLE; }     /* adding type gives reduce/reduce warning */
 	;
 
 /* Assigns a value to a variable */
-assign:		VARIABLE {  expect = "=";} EQUAL { expect = "add";} add																											{ vars->copy(*$VARIABLE, *$add); }
+assign:		VARIABLE { expect = "=";} EQUAL { expect = "add";} add																											{ vars->copy(*$VARIABLE, *$add); }
 	|	VARIABLE { expect = "array"; } array {expect = "="; } EQUAL { expect = "add"; } add																					{ vars->varToArr(*$VARIABLE, *$array, *$add); }
 	;
 
@@ -265,14 +265,6 @@ string choosenext(string next){
     else //Terminal is next
         return next;
 }
-
-/*
-TODO:
-	using var as array
-	using array as var
-	using undeclared variable
-	using undeclared array
-*/
 
 void WriteToMil(string text)
 {
