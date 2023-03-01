@@ -33,8 +33,8 @@ class operations{
 		void unassigned(string name){semerror("Use of unassigned variable \""+ name + "\"");};//
 		void unassigned(string name, string index){semerror("Use of unassigned variable \""+ name + "[" + index + "]\"");};//
 		void segfault(string name, string index){semerror("Memory access violation from \""+ name + "[" + index + "]\"");};//
-		void noMain(){semerror("No main function found");};
-		void mainArg(){semerror("main function cannot take arguments");};
+		void noMain(){semerror("No main function found");};//
+		void mainArg(){semerror("main function cannot take arguments");};//
 
 	public:
 		void newScope();

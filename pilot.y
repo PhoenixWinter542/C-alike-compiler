@@ -75,7 +75,7 @@ multfunc:	FILEEND		{  }
 	;
 
 /* Function with body */
-function:	type { expect = "VARIABLE";} VARIABLE { vars->addFunc(*$VARIABLE); expect = "(";} L_PAREN { expect = "declare";} declare { expect = ")";} R_PAREN { expect = "code";} code	{ vars->popScope(); WriteToMil(vars->getMil()); $function = $type; }
+function:	type { expect = "VARIABLE";} VARIABLE { vars->addFunc(*$VARIABLE); expect = "(";} L_PAREN { expect = "declare";} declare { expect = ")";} R_PAREN { expect = "code";} code	{ vars->popScope(); $function = $type; }
 	;
 
 /* Variable declarations for function definitions */
