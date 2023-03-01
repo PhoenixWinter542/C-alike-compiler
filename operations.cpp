@@ -33,6 +33,8 @@ class operations{
 		void unassigned(string name){semerror("Use of unassigned variable \""+ name + "\"");};//
 		void unassigned(string name, string index){semerror("Use of unassigned variable \""+ name + "[" + index + "]\"");};//
 		void segfault(string name, string index){semerror("Memory access violation from \""+ name + "[" + index + "]\"");};//
+		void noMain(){semerror("No main function found");};
+		void mainArg(){semerror("main function cannot take arguments");};
 
 	public:
 		void newScope();
@@ -45,7 +47,7 @@ class operations{
 		void addGlobal(string name, bool assigned, string array);
 		void addFunc(string name);
 		void addArg(string name){addArg(name, "");};
-		void addArg(string name, string array){addVariable(name, false, array); copy(name);};
+		void addArg(string name, string array);
 
 		//Mil Functions
 		void addParam(string name);
@@ -184,7 +186,12 @@ void operations::addGlobal(string name, bool assigned, string array){
 }
 
 
-
+	void operations::addArg(string name, string array){
+		if("main" == curFunc[scope])
+			mainArg();
+		addVariable(name, false, array);
+		copy(name);
+	};
 
 
 
@@ -325,5 +332,10 @@ void operations::go(string label, string predicate){
 	addLine("?:= " + label + ", " + predicate);
 }
 string operations::getMil(){
-	return mil;
+	for(int i = 0; i < allFunc.size(); i++){
+		if("main" == allFunc[i])
+			return mil;
+	}
+	noMain();
+	return NULL;
 }
