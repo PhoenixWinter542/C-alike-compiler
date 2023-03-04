@@ -243,6 +243,7 @@ string* operations::callFunc(string name){
 	}
 	else
 		semerror("undeclared function \"" + name + "\"");
+	failReturn = name;
 	return failReturn;
 }
 void operations::retFunc(string ret){
@@ -303,6 +304,7 @@ string* operations::arrToVar(string src, string index){
 	}
 	else
 		undeclared(src);
+	failReturn = src;
 	return failReturn;
 }
 //dst[index] = src
