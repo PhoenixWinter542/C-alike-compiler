@@ -1,7 +1,6 @@
 #include "variables.cpp"
 #include <string>
 using namespace std;
-int semerror(string s);
 
 class operations{
 	private:
@@ -10,12 +9,15 @@ class operations{
 		int scope;
 		string mil;
 		int tmpCount;
+		string errors;
 		vector<int> storeTmpCount;
 		vector<string> curFunc;	
 		vector<string> allFunc;
 		vector<string*> garbageTmp;
 		int argPos;
+		string* failReturn;
 
+		void semerror(string s);
 		void addLine(string line);
 		void beginFunc(string name);
 		void endFunc();
@@ -38,6 +40,7 @@ class operations{
 		void negArrSize(string name, string index){semerror("Invalid array size \""+ name + "[" + index + "]\"");};
 
 	public:
+		string getErrors();
 		void newScope();
 		void popScope();
 		void addVariable(string name){addVariable(name, false, "");};
@@ -78,10 +81,22 @@ class operations{
 		~operations();
 };
 
+void operations::semerror(string s){
+	extern int yylineno;
+	errors += "SEMANTIC ERROR: " + s + " on line " + toString(yylineno) + "\n";
+}
+
+
+string operations::getErrors(){
+	return errors;
+}
+
 void operations::addVariable(string name, bool assigned, string array){
 	if("" != array)
-		if('-' == array[0])
+		if('-' == array[0]){
 			negArrSize(name, array);
+			return;
+		}
 	if( false == local[scope]->addVariable(name, assigned, array))
 		redeclare(name);
 	if("" == array)
@@ -147,6 +162,8 @@ operations::operations(){
 	mil = "";
 	tmpCount = 0;
 	argPos = 0;
+	errors = "";
+	failReturn = new string("");
 }
 
 operations::~operations(){
@@ -158,6 +175,7 @@ operations::~operations(){
 		delete local.back();
 		local.pop_back();
 	}
+	delete failReturn;
 }
 
 void operations::assigned(string name){
@@ -225,7 +243,7 @@ string* operations::callFunc(string name){
 	}
 	else
 		semerror("undeclared function \"" + name + "\"");
-	return NULL;	//Should never get here
+	return failReturn;
 }
 void operations::retFunc(string ret){
 	addLine("ret " + ret);
@@ -266,39 +284,52 @@ void operations::copy(string dst){
 }
 //dst = src[index]
 string* operations::arrToVar(string src, string index){
-	if(true == local[scope]->isArray(src)){
-		if(false == local[scope]->outOfBounds(src, index)){
-			if(true == local[scope]->isAssigned(src, index)){
-				string* tmp = getTmp();
-				addLine("=[] " + *tmp + ", " + src + ", " + index);
-				return tmp;
+	if(local[scope]->isUsed(src)){
+		if(true == local[scope]->isArray(src)){
+			if(false == local[scope]->outOfBounds(src, index)){
+				if(true == local[scope]->isAssigned(src, index)){
+					string* tmp = getTmp();
+					addLine("=[] " + *tmp + ", " + src + ", " + index);
+					return tmp;
+				}
+				else
+					unassigned(src, index);
 			}
 			else
-				unassigned(src, index);
+				segfault(src, index);
 		}
 		else
-			segfault(src, index);
+			varAsArr(src);
 	}
-	varAsArr(src);
-	return NULL;	//Should never get here
+	else
+		undeclared(src);
+	return failReturn;
 }
 //dst[index] = src
 void operations::varToArr(string dst, string index, string src){
-	if(true == local[scope]->isArray(dst)){
-		if(false == local[scope]->isArray(src)){
-			if(false == local[scope]->outOfBounds(dst, index)){
-				addLine("[]= " + dst + ", " + index + ", " + src);
-				assigned(dst, index);
+	if(local[scope]->isUsed(dst)){
+		if('_' == src[0] || isdigit(src[0]) || local[scope]->isUsed(src)){
+			if(true == local[scope]->isArray(dst)){
+				if(false == local[scope]->isArray(src)){
+					if(false == local[scope]->outOfBounds(dst, index)){
+						addLine("[]= " + dst + ", " + index + ", " + src);
+						assigned(dst, index);
+					}
+					else{
+						segfault(dst, index);
+					}
+				}
+				else
+					arrAsVar(src);
 			}
-			else{
-				segfault(dst, index);
-			}
+			else
+				varAsArr(dst);
 		}
 		else
-			arrAsVar(src);
+			undeclared(src);
 	}
 	else
-		varAsArr(dst);
+		undeclared(dst);
 }
 //Sets variable to input
 void operations::read(string dst){
@@ -343,5 +374,5 @@ string operations::getMil(){
 			return mil;
 	}
 	noMain();
-	return NULL;
+	return "";
 }

@@ -277,18 +277,16 @@ string choosenext(string next){
 
 void WriteToMil(string text)
 {
-    FILE *fp;
-    fp = fopen("basic.mil", "r+");
-    fputs(text.c_str(), fp);
-    fclose(fp);
-}
-
-int semerror(string s){
-	extern int yylineno;
-
-	cerr << "SEMANTIC ERROR: " << s << " on line " << yylineno << endl;
-	delete vars;
-	exit(1);
+	string errors = vars->getErrors();
+	if("" == errors){
+    	FILE *fp;
+    	fp = fopen("basic.mil", "r+");
+    	fputs(text.c_str(), fp);
+    	fclose(fp);
+	}
+	else{
+		cerr << errors;
+	}
 }
 
 int yyerror(string s)
@@ -298,6 +296,7 @@ int yyerror(string s)
 	cerr << "ERROR: "  << " at symbol \"" << yytext;
 	cerr << "\" on line " << yylineno << endl;
 	cout << "EXPECTED: " << "\"" + choosenext(expect) + "\"" << endl;
+	delete vars;
 	exit(1);
 }
 
