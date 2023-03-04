@@ -15,7 +15,6 @@ class operations{
 		vector<string> allFunc;
 		vector<string*> garbageTmp;
 		int argPos;
-		string* failReturn;
 
 		void semerror(string s);
 		void addLine(string line);
@@ -163,7 +162,6 @@ operations::operations(){
 	tmpCount = 0;
 	argPos = 0;
 	errors = "";
-	failReturn = new string("");
 }
 
 operations::~operations(){
@@ -175,7 +173,6 @@ operations::~operations(){
 		delete local.back();
 		local.pop_back();
 	}
-	delete failReturn;
 }
 
 void operations::assigned(string name){
@@ -243,8 +240,9 @@ string* operations::callFunc(string name){
 	}
 	else
 		semerror("undeclared function \"" + name + "\"");
-	failReturn = name;
-	return failReturn;
+	string* tmp = new string(name);
+	garbageTmp.push_back(tmp);
+	return tmp;
 }
 void operations::retFunc(string ret){
 	addLine("ret " + ret);
@@ -304,8 +302,9 @@ string* operations::arrToVar(string src, string index){
 	}
 	else
 		undeclared(src);
-	failReturn = src;
-	return failReturn;
+	string* tmp = new string(src);
+	garbageTmp.push_back(tmp);
+	return tmp;
 }
 //dst[index] = src
 void operations::varToArr(string dst, string index, string src){
