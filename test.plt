@@ -8,12 +8,17 @@ int fibonacci(int k){
 }
 
 int newFunc(int n) {
-	int[-10] a;
+	int[10] a;
+	write a;
     int x; 
     x = -10;
+	write x;
 	a[0] = x;
+	write a[0];
 	a[1] = a[0];
+	write a[1];
     while (n != 10) {
+		write n;
         n = n + 1;
     }
 
@@ -24,9 +29,8 @@ int newFunc(int n) {
 }
 
 int main(){
-    int n;
-
-    read n;
-    int fib_n = fibonacci( n );
+    int n = 10;
+    //int fib_n = fibonacci( n );
+	int fib_n = newFunc(n);
     write fib_n;
 }

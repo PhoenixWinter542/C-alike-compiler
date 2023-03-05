@@ -4,7 +4,7 @@ int fibonacci(int k){
 	int[1000] a;
 	int[-1] b;
 
-	if (l < 1){
+	if (l <= 1){
 		return 1;
 	}
 	a = 0;
@@ -16,6 +16,11 @@ int poop(){
 	int fib_n;
 	read n;
 	fib_n[0] = fibonacci(n);
-
+	while(is_prime < k){
+		if(is_prime == 0){
+			write i;
+		}
+		i = i + 1;
+	}
 	write fib_n;
 }

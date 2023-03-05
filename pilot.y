@@ -152,7 +152,7 @@ assign:		VARIABLE { expect = "=";} EQUAL { expect = "add";} add																	
 	;
 
 /* Conditional statements (Includes parentheses) */
-compare:	L_PAREN { expect = "add";} add { expect = "relate";} relate { expect = "add";} add { expect = ")";} R_PAREN														{  }
+compare:	L_PAREN { expect = "add";} add { expect = "relate";} relate { expect = "add";} add { expect = ")";} R_PAREN														{ $compare = vars->combo(*$3, *$7, *$relate); }
 	;
 
 /* Declaration of local variables */
@@ -164,17 +164,17 @@ initassign:	/* empty */																																						{ $initassign = NUL
 	;
 
 /* Currently handles "do while" and "while" loops */
-loop:		WHILE { expect = "compare";} compare { expect = "code";} code																									{  }
-	|	DO { expect = "code";} code { expect = "while";} WHILE { expect = "compare";} compare { expect = ";";} END															{  }
+loop:		WHILE { vars->startLoop(); vars->startCondition(); expect = "compare";} compare { vars->endCondition();expect = "code";} code																				{ vars->endLoop(*$compare); }
+	|	DO { vars->startLoop(); expect = "code";} code { expect = "while";} WHILE { vars->startCondition(); expect = "compare";} compare { vars->endCondition(); expect = ";";} END										{ vars->endLoop(*$compare); }
 	;
 
 /* If or If else */
-case:	IF { expect = "compare";} compare { expect = "code";} code { expect = "elcase";} elcase																				{  }
+case:	IF { expect = "compare";} compare { vars->startIf(*$compare); expect = "code";} code { expect = "elcase";} elcase													{ vars->endIf(); }
 	;
 
 /* handles any else that may occur */
-elcase:		/* empty */																																						{  }
-	|	ELSE { expect = "code";} code																																		{  }
+elcase:		/* empty */																																						{ vars->startElse(); }
+	|	ELSE { vars->startElse(); expect = "code";} code																																		{  }
 	;
 
 /* List of accepted comparison operators */
@@ -203,13 +203,15 @@ middle:		/* empty */																																						{  }
 	;
 
 /* Read user input */
-read:	READ { expect = "VARIABLE"; } varcnst																																{ vars->read(*$varcnst); }
+read:	READ { expect = "vararray"; } vararray																																{ vars->read(*$vararray); }
 	;
 
 /* Output to console */
-write:	WRITE { expect = "VARIABLE"; } varcnst																																{ vars->write(*$varcnst); }
+write:	WRITE { expect = "vararray"; } vararray																																{ vars->write(*$vararray); }
 	;
 
+vararray:	VARIABLE { $vararray = $VARIABLE; }
+	|	VARIABLE { expect = "array"; } array { $vararray = vars->arrToVar(*$VARIABLE, *$array); }
 %%
 
 string choosenext(string next){
@@ -271,6 +273,8 @@ string choosenext(string next){
         return "READ";
     else if("write" == next)
         return "WRITE";
+	else if("vararray" == next)
+		return "VARIABLE";
     else //Terminal is next
         return next;
 }

@@ -4,16 +4,24 @@ using namespace std;
 
 class operations{
 	private:
+		struct labelStruct{
+			string ifLbl;
+			string elseLbl;
+		};
+
 		variables global;
 		vector<variables*> local;
 		int scope;
 		string mil;
 		int tmpCount;
+		int lblCount;
 		string errors;
 		vector<int> storeTmpCount;
 		vector<string> curFunc;	
 		vector<string> allFunc;
+		vector<labelStruct> labels;
 		vector<string*> garbageTmp;
+		bool trackCondition;
 		int argPos;
 
 		void semerror(string s);
@@ -22,9 +30,14 @@ class operations{
 		void endFunc();
 		string toString(int val);
 		string* getTmp();
+		string getLbl();
 		bool funcDeclared(string name);
 		void assigned(string name);
 		void assigned(string name, string index);
+		bool testVar(string name);
+		bool testArr(string name, string index);
+		bool isAssigned(string name);
+		bool isAssigned(string name, string index);
 
 		//Semantic handling
 		void redeclare(string name){semerror("\""+ name + "\" re-declaration");};//
@@ -51,6 +64,13 @@ class operations{
 		void addFunc(string name);
 		void addArg(string name){addArg(name, "");};
 		void addArg(string name, string array);
+		void startIf(string compare);
+		void endIf();
+		void startElse();
+		void startLoop();
+		void endLoop(string condition);
+		void startCondition(){trackCondition = true;};
+		void endCondition(){trackCondition = false;};
 
 		//Mil Functions
 		void addParam(string name);
@@ -68,6 +88,8 @@ class operations{
 		void write(string src, string index);
 		string* combo(string src1, string scr2, string op);
 		void combo(string dst, string src1, string src2, string op);
+		string* flip(string src);
+		void flip(string dst, string src);
 		void label(string label);
 		void go(string label);
 		void go(string label, string predicate);
@@ -126,6 +148,10 @@ string* operations::getTmp(){
 	return tmp;
 }
 
+string operations::getLbl(){
+	return "_lbl" + toString(lblCount++);
+}
+
 bool operations::funcDeclared(string name){
 	for(unsigned int i = 0; i < allFunc.size(); i++){
 		if(name == allFunc[i])
@@ -138,8 +164,15 @@ void operations::newScope(){
 	variables* tmp = new variables(global.getStruct());
 	local.push_back(tmp);
 	storeTmpCount.push_back(tmpCount);
+
+	if(-1 < scope)
+		local[scope + 1]->addStruct(local[scope]->getStruct());		//Variables can be accessed by nested scopes
 	scope++;
 	curFunc.push_back("");
+	labelStruct tmpLbl;
+	tmpLbl.ifLbl = "";
+	tmpLbl.elseLbl = "";
+	labels.push_back(tmpLbl);
 }
 
 void operations::popScope(){
@@ -150,6 +183,7 @@ void operations::popScope(){
 			endFunc();
 		}
 		curFunc.pop_back();
+		labels.pop_back();
 		scope--;
 		tmpCount = storeTmpCount.back();
 		storeTmpCount.pop_back();
@@ -162,6 +196,7 @@ operations::operations(){
 	tmpCount = 0;
 	argPos = 0;
 	errors = "";
+	trackCondition = false;
 }
 
 operations::~operations(){
@@ -177,20 +212,73 @@ operations::~operations(){
 
 void operations::assigned(string name){
 	local[scope]->assigned(name);
-	if(true == global.assigned(name)){		//Set global to assigned for all scopes
-		for(int i = 0; i < scope; i++){
-			local[scope]->assigned(name);
+	bool write = global.isAssigned(name);
+	for(int i = 0; i < scope; i++){
+		if(true == write)
+			local[i]->assigned(name);
+		else if(local[i]->isUsed(name)){
+			write = true;
+			local[i]->assigned(name);
 		}
 	}
 }
 
 void operations::assigned(string name, string index){
 	local[scope]->assigned(name, index);
-	if(true == global.assigned(name, index)){		//Set global to assigned for all scopes
-		for(int i = 0; i < scope; i++){
-			local[scope]->assigned(name);
+	bool write = global.isAssigned(name, index);
+	for(int i = 0; i < scope; i++){
+		if(true == write)
+			local[i]->assigned(name, index);
+		else if(local[i]->isUsed(name)){
+			write = true;
+			local[i]->assigned(name, index);
 		}
 	}
+}
+
+bool operations::testVar(string name){
+	if('_' != name[0] && false == isdigit(name[0]) && false == local[scope]->isUsed(name)){
+		unassigned(name);
+		return false;
+	}
+	else if(true == local[scope]->isArray(name)){
+		arrAsVar(name);
+		return false;
+	}
+	return true;
+
+}
+
+bool operations::testArr(string name, string index){
+	if(false == local[scope]->isUsed(name)){
+		unassigned(name);
+		return false;
+	}
+	else if(false == local[scope]->isArray(name)){
+		varAsArr(name);
+		return false;
+	}
+	else if(true == local[scope]->outOfBounds(name, index)){
+		segfault(name, index);
+		return false;
+	}
+	return true;
+}
+
+bool operations::isAssigned(string name){
+	if('_' != name[0] && false == isdigit(name[0]) && false == local[scope]->isAssigned(name)){
+		unassigned(name);
+		return false;
+	}
+	return true;
+}
+
+bool operations::isAssigned(string name, string index){
+	if('_' != name[0] && false == isdigit(name[0]) && false == local[scope]->isAssigned(name, index)){
+		unassigned(name, index);
+		return false;
+	}
+	return true;
 }
 
 void operations::addGlobal(string name, bool assigned, string array){
@@ -208,10 +296,39 @@ void operations::addGlobal(string name, bool assigned, string array){
 	void operations::addArg(string name, string array){
 		if("main" == curFunc[scope])
 			mainArg();
-		addVariable(name, false, array);
+		addVariable(name, true, array);
 		copy(name);
 	}
 
+	void operations::startIf(string condition){
+		newScope();
+		labels[scope].elseLbl = getLbl();
+		labels[scope].ifLbl = getLbl();
+		flip(condition, condition);		//condition = !condition
+		go(labels[scope].elseLbl, condition);
+	}
+
+	void operations::endIf(){
+		label(labels[scope].ifLbl);
+		popScope();
+	}
+
+	void operations::startElse(){
+		go(labels[scope].ifLbl);
+		label(labels[scope].elseLbl);
+	}
+
+	void operations::startLoop(){
+		newScope();
+		labels[scope].ifLbl = getLbl();
+		label(labels[scope].ifLbl);
+	}
+
+	void operations::endLoop(string condition){
+		mil += labels[scope].elseLbl;
+		go(labels[scope].ifLbl, condition);
+		popScope();
+	}
 
 
 //------------------------------------------------------------------------------------------------------------------------------------------------
@@ -219,7 +336,10 @@ void operations::addGlobal(string name, bool assigned, string array){
 
 
 void operations::addLine(string line){
-	mil += line + "\n";
+	if(true == trackCondition)
+		labels[scope].elseLbl += line + "\n";
+	else
+		mil += line + "\n";
 }
 
 void operations::beginFunc(string name){
@@ -257,96 +377,73 @@ void operations::declare(string name, string size){
 }
 //dst = src
 void operations::copy(string dst, string src){
-	if(local[scope]->isUsed(dst)){
-		if(local[scope]->isArray(dst))
-			arrAsVar(dst);
-		if(local[scope]->isArray(src))
-			arrAsVar(src);
+	if(testVar(dst) && testVar(src)){
 		if('-' == src[0])
 			src = *combo("0", src.substr(1), "-");
-		if('_' == src[0] || isdigit(src[0]) || true == local[scope]->isAssigned(src)){		//strings starting with _ are assigned when created, strings starting with digit are constants
+		if(true == isAssigned(src)){		//strings starting with _ are assigned when created, strings starting with digit are constants
 			addLine("= " + dst + ", " + src);
 			assigned(dst);
 		}
-		else
-			unassigned(src);
 	}
-	else
-		undeclared(dst);
 }
 //Declares parameter values		= dst, $0		 	dst = $0 ($0 is the 1st function parameter) 
 void operations::copy(string dst){
-	if(local[scope]->isUsed(dst))	//Shouldn't be neccessary considering addArg is the only path here
+	if(true == testVar(dst))	//Shouldn't be neccessary considering addArg is the only path here
 		addLine("= " + dst + ", " + "$" + toString(argPos++));
-	else
-		undeclared(dst);
 }
 //dst = src[index]
 string* operations::arrToVar(string src, string index){
-	if(local[scope]->isUsed(src)){
-		if(true == local[scope]->isArray(src)){
-			if(false == local[scope]->outOfBounds(src, index)){
-				if(true == local[scope]->isAssigned(src, index)){
-					string* tmp = getTmp();
-					addLine("=[] " + *tmp + ", " + src + ", " + index);
-					return tmp;
-				}
-				else
-					unassigned(src, index);
-			}
-			else
-				segfault(src, index);
+	if(true == testArr(src, index)){
+		if(true == isAssigned(src, index)){
+			string* tmp = getTmp();
+			addLine("=[] " + *tmp + ", " + src + ", " + index);
+			return tmp;
 		}
-		else
-			varAsArr(src);
 	}
-	else
-		undeclared(src);
 	string* tmp = new string(src);
 	garbageTmp.push_back(tmp);
 	return tmp;
 }
 //dst[index] = src
 void operations::varToArr(string dst, string index, string src){
-	if(local[scope]->isUsed(dst)){
-		if('_' == src[0] || isdigit(src[0]) || local[scope]->isUsed(src)){
-			if(true == local[scope]->isArray(dst)){
-				if(false == local[scope]->isArray(src)){
-					if(false == local[scope]->outOfBounds(dst, index)){
-						addLine("[]= " + dst + ", " + index + ", " + src);
-						assigned(dst, index);
-					}
-					else{
-						segfault(dst, index);
-					}
-				}
-				else
-					arrAsVar(src);
-			}
-			else
-				varAsArr(dst);
+	if(true == testArr(dst, index) && true == testVar(src)){
+		if(true == isAssigned(src)){
+			addLine("[]= " + dst + ", " + index + ", " + src);
+			assigned(dst, index);
 		}
-		else
-			undeclared(src);
 	}
-	else
-		undeclared(dst);
 }
 //Sets variable to input
 void operations::read(string dst){
-	addLine(".< " + dst);
+	if(true == testVar(dst))
+		addLine(".< " + dst);
+	else
+		arrAsVar(dst);
 }
 //Sets array element to input
 void operations::read(string dst, string index){
-	addLine(".[]< " + dst + ", " + index );
+	if(true == testArr(dst, index)){
+		addLine(".[]< " + dst + ", " + index );
+	}
 }
 //Outputs variable
 void operations::write(string src){
-	addLine(".> " + src);
+	if(true == testVar(src)){
+		if('_' == src[0] || true == local[scope]->isAssigned(src)){		//strings starting with _ are assigned when created
+			addLine(".> " + src);
+		}
+		else
+			unassigned(src);
+	}
 }
 //Outputs array element
 void operations::write(string src, string index){
-	addLine(".[]> " + src + ", " + index );
+	if(true == testArr(src, index)){
+		if(true == local[scope]->isAssigned(src))
+			addLine(".[]> " + src + ", " + index );
+		else
+			unassigned(src, index);
+	}
 }
 string* operations::combo(string src1, string src2, string op){
 	string* tmp = getTmp();
@@ -355,7 +452,26 @@ string* operations::combo(string src1, string src2, string op){
 }
 //Handles math, comparison, logical operators
 void operations::combo(string dst, string src1, string src2, string op){
-	addLine(op + " " + dst + ", " + src1 + ", " + src2);
+	if(true == testVar(dst) && true == testVar(src1) && true == testVar(src2)){
+		if(true == isAssigned(src1)){
+			if(true == isAssigned(src2)){
+				addLine(op + " " + dst + ", " + src1 + ", " + src2);
+			}
+		}
+	}
+}
+//dst = !src
+string* operations::flip(string src){
+	string* dst = getTmp();
+	flip(*dst, src);
+	return dst;
+}
+//dst = !src
+void operations::flip(string dst, string src){
+	if(true == testVar(dst) && true == testVar(src)){
+		if(true == isAssigned(src))
+			addLine("! " + dst + ", " + src);
+	}
 }
 //Create label
 void operations::label(string label){

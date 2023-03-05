@@ -28,6 +28,7 @@ class variables{
 		bool isArray(string strSize);
 		bool outOfBounds(string name, string index);
 		vector<varStruct> getStruct();
+		void addStruct(vector<varStruct> toAdd);
 		
 		//Constructors
 		variables(){};
@@ -138,7 +139,7 @@ bool variables::isArray(string name){
 
 bool variables::outOfBounds(string name, string index){
 	int pos = findPos(name);
-	int tmp = atoi(index);
+	unsigned int tmp = atoi(index);
 	if(-1 != pos){
 		if('-' == index[0] || varNames[pos].array.size() <= tmp)
 			return true;
@@ -150,4 +151,11 @@ bool variables::outOfBounds(string name, string index){
 
 vector<varStruct> variables::getStruct(){
 	return varNames;
+}
+
+void variables::addStruct(vector<varStruct> toAdd){
+	for(unsigned int i = 0; i < toAdd.size(); i++){
+		if(false == isUsed(toAdd[i].name))
+			push(toAdd[i].name, toAdd[i].assigned, toAdd[i].array);
+	}
 }
