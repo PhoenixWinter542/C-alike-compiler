@@ -15,6 +15,8 @@ LTE         <=
 GTE         >=
 COMPEQUAL   ==
 NOT         !
+OR			"||"
+AND			"&&"
 
 /* Math */
 ADD         "+"
@@ -76,6 +78,8 @@ ALNUM       [a-zA-Z0-9]+
 {GTE}   	{ yylval = new std::string(yytext); return GTE; }
 {COMPEQUAL}	{ yylval = new std::string(yytext); return COMPEQUAL; }
 {NOT}   	{ yylval = new std::string(yytext); return NOT; }
+{OR}		{ yylval = new std::string(yytext); return OR; }
+{AND}		{ yylval = new std::string(yytext); return AND; }
  /* Math */
 {ADD}		{ yylval = new std::string(yytext); return ADD; }
 {SUBTRACT}	{ yylval = new std::string(yytext); return SUBTRACT; }

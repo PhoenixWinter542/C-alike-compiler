@@ -23,6 +23,8 @@ operations* vars = new operations();
 %token	GTE
 %token	COMPEQUAL
 %token	NOT
+%token	OR
+%token	AND
 
 /* Math */
 %token	ADD
@@ -94,16 +96,20 @@ vararraydec:		VARIABLE {  vars->addArg(*$VARIABLE); expect = "multdec";} multdec
 	| array {expect = "VARIABLE"; } VARIABLE { expect = "multdec"; vars->addArg(*$VARIABLE, *$array); } multdec
 
 /* call to a function */
-call:		VARIABLE { expect = "(";} L_PAREN { expect = "add";} add { vars->addParam(*$add); expect = "multarg";} multarg { expect = ")";} R_PAREN					{ $call = vars->callFunc(*$VARIABLE); }
+call:		callstart { expect = ")"; } R_PAREN																																{ $call = vars->callFunc(*$callstart); }
+	|	callstart { expect = "add"; } add { vars->addParam(*$add); expect = "multarg";} multarg { expect = ")";} R_PAREN													{ $call = vars->callFunc(*$callstart); }
+	;
+
+callstart: VARIABLE { expect = "(";} L_PAREN																																{ $callstart = $VARIABLE; }
 	;
 
 /* Handles having more than one argument */
-multarg:	/* empty */																																						{  }
+multarg:	/* empty */
 	|	SEPARATOR { expect = "add";} add { expect = "multarg";} multarg																										{ vars->addParam(*$add); }
 	;
 
 /* List of accepted types */
-type:		INTEGER																																							{ }
+type:		INTEGER
 	;
 
 /* Variables, constants, and things that return constants */
@@ -152,7 +158,16 @@ assign:		VARIABLE { expect = "=";} EQUAL { expect = "add";} add																	
 	;
 
 /* Conditional statements (Includes parentheses) */
-compare:	L_PAREN { expect = "add";} add { expect = "relate";} relate { expect = "add";} add { expect = ")";} R_PAREN														{ $compare = vars->combo(*$3, *$7, *$relate); }
+compare:	L_PAREN { expect = "multcompare"; } multcompare { expect = ")"; } R_PAREN	{ $compare = $multcompare; }
+	;
+
+multcompare:	comparestart											{ $$ = $comparestart;}
+	|	comparestart OR { expect = "multcompare"; } multcompare			{ $$ = vars->combo(*$comparestart, *$4, "||"); }
+	|	comparestart AND { expect = "multcompare"; } multcompare 		{ $$ = vars->combo(*$comparestart, *$4, "&&"); }
+	;
+
+comparestart:
+	|	add { expect = "relate"; }relate { expect = "add"; } add		{ $comparestart = vars->combo(*$1, *$5, *$relate); expect = "), ||, &&"; }
 	;
 
 /* Declaration of local variables */
@@ -164,8 +179,8 @@ initassign:	/* empty */																																						{ $initassign = NUL
 	;
 
 /* Currently handles "do while" and "while" loops */
-loop:		WHILE { vars->startLoop(); vars->startCondition(); expect = "compare";} compare { vars->endCondition();expect = "code";} code																				{ vars->endLoop(*$compare); }
-	|	DO { vars->startLoop(); expect = "code";} code { expect = "while";} WHILE { vars->startCondition(); expect = "compare";} compare { vars->endCondition(); expect = ";";} END										{ vars->endLoop(*$compare); }
+loop:		WHILE { vars->newScope(); vars->startCondition(); expect = "compare";} compare { vars->endCondition(); vars->startLoop(*$compare); expect = "code";} code					{ vars->endLoop(); }
+	|	DO { vars->startLoop(); expect = "code";} code { expect = "while";} WHILE { vars->startCondition(); expect = "compare";} compare { vars->endCondition(); expect = ";";} END		{ vars->endLoop(*$compare); }
 	;
 
 /* If or If else */
@@ -174,7 +189,7 @@ case:	IF { expect = "compare";} compare { vars->startIf(*$compare); expect = "co
 
 /* handles any else that may occur */
 elcase:		/* empty */																																						{ vars->startElse(); }
-	|	ELSE { vars->startElse(); expect = "code";} code																																		{  }
+	|	ELSE { vars->startElse(); expect = "code";} code
 	;
 
 /* List of accepted comparison operators */
@@ -187,19 +202,19 @@ relate:		LESS																																							{ $relate = $LESS; }
 	;
 
 /* Enforces the braces around a code block */
-code:	L_BRACE { expect = "middle";} middle { expect = "}";} R_BRACE																										{  }
+code:	L_BRACE { expect = "middle";} middle { expect = "}";} R_BRACE
 	;
 
 /* List of all things that can be in a code block */
-middle:		/* empty */																																						{  }
-	|	assign { expect = ";";} END { expect = "middle";} middle																											{  }
-	|	init { expect = ";";} END { expect = "middle";} middle																												{  }
-	|	loop { expect = "middle";} middle																																	{  }
-	|	case { expect = "middle";} middle																																	{  }
-	|	read { expect = ";";} END { expect = "middle";} middle																												{  }
-	|	write { expect = ";";} END { expect = "middle";} middle																												{  }
-	|	arraydec { expect = ";";} END { expect = "middle";} middle																											{  }
-	|	RETURN { expect = "add";} add { vars->retFunc(*$add); expect = ";";} END { expect = "middle";} middle																{  }
+middle:		/* empty */
+	|	assign { expect = ";";} END { expect = "middle";} middle
+	|	init { expect = ";";} END { expect = "middle";} middle
+	|	loop { expect = "middle";} middle
+	|	case { expect = "middle";} middle
+	|	read { expect = ";";} END { expect = "middle";} middle
+	|	write { expect = ";";} END { expect = "middle";} middle
+	|	arraydec { expect = ";";} END { expect = "middle";} middle
+	|	RETURN { expect = "add";} add { vars->retFunc(*$add); expect = ";";} END { expect = "middle";} middle
 	;
 
 /* Read user input */

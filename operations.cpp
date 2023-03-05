@@ -68,6 +68,8 @@ class operations{
 		void endIf();
 		void startElse();
 		void startLoop();
+		void startLoop(string condition);
+		void endLoop();
 		void endLoop(string condition);
 		void startCondition(){trackCondition = true;};
 		void endCondition(){trackCondition = false;};
@@ -324,6 +326,21 @@ void operations::addGlobal(string name, bool assigned, string array){
 		label(labels[scope].ifLbl);
 	}
 
+	void operations::startLoop(string condition){
+		labels[scope].ifLbl = getLbl();
+		label(labels[scope].ifLbl);
+		mil += labels[scope].elseLbl;
+		labels[scope].elseLbl = getLbl();
+		flip(condition, condition);
+		go(labels[scope].elseLbl, condition);
+	}
+
+	void operations::endLoop(){
+		go(labels[scope].ifLbl);
+		label(labels[scope].elseLbl);
+		popScope();
+	}
+
 	void operations::endLoop(string condition){
 		mil += labels[scope].elseLbl;
 		go(labels[scope].ifLbl, condition);
@@ -359,7 +376,7 @@ string* operations::callFunc(string name){
 		return tmp;
 	}
 	else
-		semerror("undeclared function \"" + name + "\"");
+		semerror("Use of undeclared function \"" + name + "\"");
 	string* tmp = new string(name);
 	garbageTmp.push_back(tmp);
 	return tmp;
@@ -377,9 +394,9 @@ void operations::declare(string name, string size){
 }
 //dst = src
 void operations::copy(string dst, string src){
+	if('-' == src[0])
+		src = *combo("0", src.substr(1), "-");
 	if(testVar(dst) && testVar(src)){
-		if('-' == src[0])
-			src = *combo("0", src.substr(1), "-");
 		if(true == isAssigned(src)){		//strings starting with _ are assigned when created, strings starting with digit are constants
 			addLine("= " + dst + ", " + src);
 			assigned(dst);
