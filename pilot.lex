@@ -47,6 +47,7 @@ ELSE        else
 /* Loops */
 WHILE       while
 DO          do
+BREAK		break
 
 /* Storage */
 READ        read
@@ -105,6 +106,7 @@ ALNUM       [a-zA-Z0-9]+
  /* Loops */
 {WHILE}	    { yylval = new std::string(yytext); return WHILE; }
 {DO}	    { yylval = new std::string(yytext); return DO; }
+{BREAK}		{ yylval = new std::string(yytext); return BREAK; }
  /* Types */
 {INTEGER}	{ yylval = new std::string(yytext); return INTEGER; }
  /* Storage */

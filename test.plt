@@ -13,16 +13,24 @@ int newFunc() {
 //	x = -10;
 //	a[0] = x;
 //	a[1] = a[0];
-int n = 11;
-    while (n != 10 && n < 100 || n == 100) {
-		write n;
-        n = n + 1;
-    }
-
-    do {
-        n = n + 1;
-    }
-    while (n <= 10);
+	int n = 11;
+	while (n != 10 && n < 100 || n == 100) {
+		n = n + 1;
+		if(30 < n){
+			if(31 == n){
+				break;
+			}
+			break;
+		}
+	}
+	break;
+	do {
+		if(10 <= n){
+			break;
+		}
+		n = n + 1;
+	}
+	while (n <= 10);
 	return n;
 }
 

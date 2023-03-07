@@ -7,6 +7,7 @@ class operations{
 		struct labelStruct{
 			string ifLbl;
 			string elseLbl;
+			string assignCond;
 		};
 
 		variables global;
@@ -50,6 +51,7 @@ class operations{
 		void noMain(){semerror("No main function found");};//
 		void mainArg(){semerror("main function cannot take arguments");};//
 		void negArrSize(string name, string index){semerror("Invalid array size \""+ name + "[" + index + "]\"");};
+		void invalidBreak(){semerror("Invalid break");};
 
 	public:
 		string getErrors();
@@ -73,6 +75,7 @@ class operations{
 		void endLoop(string condition);
 		void startCondition(){trackCondition = true;};
 		void endCondition(){trackCondition = false;};
+		void escape();
 
 		//Mil Functions
 		void addParam(string name);
@@ -174,6 +177,7 @@ void operations::newScope(){
 	labelStruct tmpLbl;
 	tmpLbl.ifLbl = "";
 	tmpLbl.elseLbl = "";
+	tmpLbl.assignCond = "";
 	labels.push_back(tmpLbl);
 }
 
@@ -323,14 +327,15 @@ void operations::addGlobal(string name, bool assigned, string array){
 	void operations::startLoop(){
 		newScope();
 		labels[scope].ifLbl = getLbl();
+		labels[scope].elseLbl = getLbl();
 		label(labels[scope].ifLbl);
 	}
 
 	void operations::startLoop(string condition){
 		labels[scope].ifLbl = getLbl();
-		label(labels[scope].ifLbl);
-		mil += labels[scope].elseLbl;
 		labels[scope].elseLbl = getLbl();
+		label(labels[scope].ifLbl);
+		mil += labels[scope].assignCond;
 		flip(condition, condition);
 		go(labels[scope].elseLbl, condition);
 	}
@@ -342,9 +347,22 @@ void operations::addGlobal(string name, bool assigned, string array){
 	}
 
 	void operations::endLoop(string condition){
-		mil += labels[scope].elseLbl;
+		mil += labels[scope].assignCond;
 		go(labels[scope].ifLbl, condition);
+		label(labels[scope].elseLbl);
 		popScope();
+	}
+
+	void operations::escape(){
+		if(false == trackCondition){
+			if(1 < scope){
+				if("" != labels[scope - 1].elseLbl){
+					go(labels[scope - 1].elseLbl);
+					return;
+				}
+			}
+		}
+		invalidBreak();
 	}
 
 
@@ -354,7 +372,7 @@ void operations::addGlobal(string name, bool assigned, string array){
 
 void operations::addLine(string line){
 	if(true == trackCondition)
-		labels[scope].elseLbl += line + "\n";
+		labels[scope].assignCond += line + "\n";
 	else
 		mil += line + "\n";
 }

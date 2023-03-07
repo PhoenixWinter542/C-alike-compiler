@@ -55,6 +55,7 @@ operations* vars = new operations();
 /* Loops */
 %left	WHILE
 %left  	DO
+%left	BREAK
 
 /* Storage */
 %left VARIABLE
@@ -215,6 +216,7 @@ middle:		/* empty */
 	|	write { expect = ";";} END { expect = "middle";} middle
 	|	arraydec { expect = ";";} END { expect = "middle";} middle
 	|	RETURN { expect = "add";} add { vars->retFunc(*$add); expect = ";";} END { expect = "middle";} middle
+	|	BREAK { expect = ";"; } END { vars->escape(); expect = "middle"; } middle
 	;
 
 /* Read user input */
